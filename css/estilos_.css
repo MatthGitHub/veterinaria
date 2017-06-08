@@ -1,0 +1,109 @@
+.estilo_body {
+	background-color: #FFFFFF;
+	margin-top: 20px;
+}
+
+.estilo_body_2 {
+	background-color: #FFFFFF;
+	margin-top: 20px;
+}
+
+.etiquetas_encabezado {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	color: #333333;
+}
+
+.datos_encabezado {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: normal;
+	color: #333333;
+}
+
+.etiquetas {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	font-weight: bold;
+	color: #333333;
+}
+
+.informacion {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	font-weight: normal;
+	color: #333333;
+}
+
+.titulos_pantalla {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	font-weight: bold;
+	color: #000000;
+	background-color: #A8B6C6;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.titulos_pantalla_index {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	font-weight: bold;
+	color: #000000;
+	background-color: #FFFFFF;
+	text-align: center;
+	vertical-align: middle;
+}
+A.menu_principal {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 15px;
+	color: #000000;
+	text-decoration: none;
+	font-weight: bold;
+}
+A.menu_principal:hover {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 15px;
+	color: #666666;
+	text-decoration: none;
+}
+
+A.enlace_opcion {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 15px;
+	color: #000000;
+	text-decoration: none;
+	font-weight: bold;
+}
+A.enlace_opcion:hover {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 15px;
+	color: #666666;
+	text-decoration: none;
+}
+
+.datos{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-style: normal;
+	color: #000000;
+	font-weight: normal;
+}
+
+.datos_resaltado{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-style: normal;
+	color: #FF0000;
+	font-weight: normal;
+}
+
+.datos_sin_edicion{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-style: normal;
+	color: #000000;
+	font-weight: normal;
+	background-color: #CCCCCC;
+}
