@@ -20,37 +20,36 @@ $cargaInicialForm = 0;
 $flagPersistencia = false;
 
 //Capturo dni encontrado
-$buscar_dni = $_GET['txt_buscar_dni'];
+$buscar_dni = $_POST['txt_buscar_dni'];
 
 if ($buscar_dni == "") {
 	$dni=$buscar_dni= $pDni;
 }
 
 //#########################################LLAMO A BUSCAR PROPIETARIO################################
-if (!empty($buscar_dni))
-{
+if (!empty($buscar_dni)){
 	$propietario = sql_buscar_propietario($buscar_dni);
 
 	$numeroRow = mysql_num_rows($propietario); // obtenemos el número de filas
 
 	if ($propietario && $numeroRow > 0)
 	{
-		while ($row=mysql_fetch_array($propietario))
-		{
-			$dni = ($row['documento']);
-			$nombre = ($row['nombre']);
-			$apellido = ($row['apellido']);
-			$telefono = ($row['telefono']);
-			$calle = ($row['calle']);
-			$numero = ($row['numero']);
-			$barrio = ($row['barrio']);
-			$piso = ($row['piso']);
-			$dpto = ($row['departamento']);
-			$email = ($row['email']);
+		while ($row=mysql_fetch_array($propietario)){
+			$dni = ($row['DOCUMENTO']);
+			$nombre = ($row['NOMBRE']);
+			$apellido = ($row['APELLIDO']);
+			$telefono = ($row['TELEFONO']);
+			$calle = ($row['CALLE_NOCOD']);
+			$numero = ($row['NUMERACION_CALLE']);
+			$barrio = ($row['BARRIO']);
+			$piso = ($row['PISO']);
+			$dpto = ($row['DEPARTAMENTO']);
+			$email = ($row['E_MAIL']);
 		}
+	}else{
+		header("Location:frm_alta_propietario.php?DNI=$buscar_dni");
+		exit();
 	}
-		else
-		$resultadoBusqueda= "La persona no se encuetra cargada en el Sistema";
 }
 
 ?>
@@ -156,35 +155,35 @@ if (!empty($buscar_dni))
 											<div class="form-group">
 											   <div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-hashtag fa-fw"></i> Número*</span>
-													<input name="txt_nro" type="text" class="form-control" id="txt_domicilio" value="<?php echo $numero;?>"/>
+													<input name="txt_nro" type="text" class="form-control" id="txt_domicilio" value="<?php echo $numero;?>" disabled="disabled"/>
 												</div>
 											</div>
 
 											<div class="form-group">
 											   <div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-map-o fa-fw"></i> Barrio</span>
-													<input name="txt_barrio" type="text" class="form-control" id="txt_domicilio" value="<?php echo $barrio;?>"/>
+													<input name="txt_barrio" type="text" class="form-control" id="txt_domicilio" value="<?php echo $barrio;?>" disabled="disabled"/>
 											   </div>
 											</div>
 
 											<div class="form-group">
 											   <div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-building-o fa-fw"></i> Piso</span>
-													<input name="txt_piso" type="text" class="form-control" id="txt_piso" value="<?php echo $piso;?>"/>
+													<input name="txt_piso" type="text" class="form-control" id="txt_piso" value="<?php echo $piso;?>" disabled="disabled"/>
 											   </div>
 											</div>
 
 											<div class="form-group">
 											   <div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-building-o fa-fw"></i> Dpto.</span>
-													<input name="txt_dpto" type="text" class="form-control" id="txt_dpto" value="<?php echo $dpto;?>"/>
+													<input name="txt_dpto" type="text" class="form-control" id="txt_dpto" value="<?php echo $dpto;?>" disabled="disabled"/>
 											   </div>
 											</div>
 
 											<div class="form-group">
 												<div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-phone fa-fw"></i> Teléfono*</span>
-													<input name="txt_telefono" type="text" class="form-control" id="txt_telefono" value="<?php echo $telefono;?>"/>
+													<input name="txt_telefono" type="text" class="form-control" id="txt_telefono" value="<?php echo $telefono;?>" disabled="disabled"/>
 												</div>
 											</div>
 

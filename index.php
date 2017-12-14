@@ -78,6 +78,19 @@ body
 		echo "";
 		}
 		?>
+
+		<?php
+		if(isset($_GET['desconectado'])){
+		echo "
+		<div class='alert alert-danger-alt alert-dismissable'>
+						<span class='glyphicon glyphicon-exclamation-sign'></span>
+						<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
+							×</button>Por tiempo de inactividad o falta de permisos </div>
+		";
+		}else{
+		echo "";
+		}
+		?>
 				</div>
 			</div>
 			<div class="panel-footer">

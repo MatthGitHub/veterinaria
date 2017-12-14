@@ -13,7 +13,24 @@
 		return $link;
 	}
 
-	
+
+	function Conexion(){
+
+		$servidor = 'localhost';
+		$base_de_datos ='veterinaria';
+		$usuario = 'root';
+		$clave = 'cavaliere';
+
+		$conexion = new mysqli($servidor,$usuario,$clave,$base_de_datos);
+		mysqli_set_charset($conexion,'utf8');
+		if ($conexion->connect_error) {
+
+			die('Error en la conexion : '.$conexion->connect_errno.'-'.$conexion->connect_error);
+
+		}
+		return $conexion;
+	}
+
 //---Manejo de fechas------------------------------------
 function fecha_mysql_normal($fechavieja){
     list($a,$m,$d)=explode("-",$fechavieja);
@@ -33,7 +50,7 @@ function timestampToFecha ($timeStamp)
 		  $anio=$fechaDelTime[year];
 		  $hora=$fechaDelTime[hours];
 		  $minuto=$fechaDelTime[minutes];
-$fechaDelTime=$dia."-".$mes."-".$anio;		
+$fechaDelTime=$dia."-".$mes."-".$anio;
 
     return $fechaDelTime;
 }
@@ -43,22 +60,22 @@ function fechaToTimestamp ($cadena)
 {
     $retorno = "";
 
-    
+
     list ($dia, $mes, $anyo)          = explode ("-", $fecha);
-	
-   
+
+
     if (!$fecha)
     {
         list ($dia, $mes, $anyo) = explode ("-", $cadena);
     }
-       
-  
+
+
     $retorno = mktime(0,0,0,$mes,$dia,$anyo);
 
     return $retorno;
 }
 
-//---------------------------------------		
+//---------------------------------------
 
 	////////////////////////////////////////////////////
 	//Convierte fecha de mysql a normal
@@ -81,22 +98,22 @@ function fechaToTimestamp ($cadena)
 	////////////////////////////////////////////////////
 	//Convierte fecha de normal a mysql
 	////////////////////////////////////////////////////
-	
+
 	function cambiaf_a_mysql($fecha){
 		ereg( "([0-9]{1,2})/([0-9]{1,2})/([0-9]{2,4})", $fecha, $mifecha);
 		$lafecha=$mifecha[3]."-".$mifecha[2]."-".$mifecha[1];
 		return $lafecha;
-	} 
-	function lngBuscaId($txtTabla,$lngId) 
+	}
+	function lngBuscaId($txtTabla,$lngId)
 	{
-		
+
 		$link=Conectarse();
 		$qry="Select max($lngId) from $txtTabla;";
 		$result=mssql_query($qry,$link);
 		$tuplas=0;
 		$tuplas = mssql_num_rows($result);
-		
-		
+
+
 		if ($tuplas!=0)
 		{
 			while($array = mssql_fetch_array($result)) {
@@ -109,7 +126,7 @@ function fechaToTimestamp ($cadena)
 			 $id=1;
 			 return $id;
 		}
-				
+
 	}
 	function GetIP()
 	{
@@ -119,17 +136,17 @@ function fechaToTimestamp ($cadena)
 			   $ip = getenv("HTTP_X_FORWARDED_FOR");
 	   else if (getenv("REMOTE_ADDR") && strcasecmp(getenv("REMOTE_ADDR"), "unknown"))
 			   $ip = getenv("REMOTE_ADDR");
-	   else if (isset($_SERVER[´REMOTE_ADDR´]) && $_SERVER[´REMOTE_ADDR´] && strcasecmp($_SERVER[´REMOTE_ADDR´], "unknown"))
-			   $ip = $_SERVER[´REMOTE_ADDR´];
+	   else if (isset($_SERVER[ï¿½REMOTE_ADDRï¿½]) && $_SERVER[ï¿½REMOTE_ADDRï¿½] && strcasecmp($_SERVER[ï¿½REMOTE_ADDRï¿½], "unknown"))
+			   $ip = $_SERVER[ï¿½REMOTE_ADDRï¿½];
 	   else
 			   $ip = "unknown";
-	  
+
 	   return($ip);
 	}
 
 	function fecha()
 	{
-		/* Definición de los meses del año en castellano */
+		/* Definiciï¿½n de los meses del aï¿½o en castellano */
 		$mes[0]="-";
 		$mes[1]="enero";
 		$mes[2]="febrero";
@@ -144,25 +161,25 @@ function fechaToTimestamp ($cadena)
 		$mes[11]="noviembre";
 		$mes[12]="diciembre";
 
-		/* Definición de los días de la semana */
+		/* Definiciï¿½n de los dï¿½as de la semana */
 		$dia[0]="Domingo";
 		$dia[1]="Lunes";
 		$dia[2]="Martes";
-		$dia[3]="Miércoles";
+		$dia[3]="Miï¿½rcoles";
 		$dia[4]="Jueves";
 		$dia[5]="Viernes";
-		$dia[6]="Sábado";
-		
-		/* Implementación de las variables que calculan la fecha */
+		$dia[6]="Sï¿½bado";
+
+		/* Implementaciï¿½n de las variables que calculan la fecha */
 		$gisett=(int)date("w");
 		$mesnum=(int)date("m");
 		/* Variable que calcula la hora*/
 		$hora = date(" H:i",time());
-		
-		/* Presentación de los resultados en una forma similar a la siguiente:
-		Miércoles, 23 de junio de 2004 | 17:20
+
+		/* Presentaciï¿½n de los resultados en una forma similar a la siguiente:
+		Miï¿½rcoles, 23 de junio de 2004 | 17:20
 		*/
-		
+
 		return $dia[$gisett].", ".date("d")." de ".$mes[$mesnum]." de ".date("Y")." | ".$hora;
 	}
 	//mostrar un fecha con formato normal

@@ -1,11 +1,9 @@
 
-<?php 
+<?php
 include("../lib/funciones.php");
-include("../mod_sql/sql.php");	
-
-error_reporting(0);
+include("../mod_sql/sql.php");
 //--------------------------------Inicio de sesion------------------------
-include("../lib/sesion.php"); 
+include("../lib/sesion.php");
 if ($_SESSION['permiso'] != 'autorizado' ){
 	$mensaje="Usuario sin permisos";
 	$destino="../index.php";
@@ -38,6 +36,9 @@ $txt_piso = "";
 $txt_dpto = "";
 $txt_email = "";
 
+if ($_SERVER["REQUEST_METHOD"] == "GET") {
+	$txt_dni = test_input($_GET['DNI']);
+}
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$txt_nombre_propietario = test_input($_POST['txt_nombre_propietario']);
 	$txt_apellido = test_input($_POST['txt_apellido']);
@@ -49,7 +50,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$txt_piso = test_input($_POST['txt_piso']);
 	$txt_dpto = test_input($_POST['txt_dpto']);
 	$txt_email = test_input($_POST['txt_email']);
+	$txt_cp = test_input($_POST['txt_cp']);
+	$txt_ec = test_input($_POST['txt_ec']);
+	$txt_fecha_nac = test_input($_POST['txt_fecha_nac']);
 
+	$valor = explode('.',$_POST['select_ec']);
+	$txt_ec = $valor[0];
 
 	if ($txt_nombre_propietario == "")
 	{
@@ -58,9 +64,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	{
 		$valApellido = true;
 	}elseif($txt_dni == "")
-	{   
+	{
 		$valDni = true;
-	}elseif(!is_numeric($txt_dni)) 
+	}elseif(!is_numeric($txt_dni))
 	{
 		$valdniNum = true;
 	}elseif($txt_calle == "")
@@ -88,10 +94,10 @@ function test_input($data) {
 
 if($validado == true)
 {
-	//Controlo que no exista la persona	
+	//Controlo que no exista la persona
 	if (!sql_buscar_persona_duplicada($txt_dni))
-	{	
-		$persona = sql_insert_persona($txt_nombre_propietario,$txt_apellido,$txt_dni,$txt_telefono,$txt_calle,$txt_nro,$txt_barrio,$txt_piso, $txt_dpto, $txt_email);	
+	{
+		$persona = sql_insert_persona($txt_nombre_propietario,$txt_apellido,$txt_dni,$txt_telefono,$txt_calle,$txt_sexo,$txt_nro,$txt_barrio,$txt_piso, $txt_dpto, $txt_email,$txt_ec,$txt_fecha_nac,$txt_pais,$txt_cp);
 
 		if ($persona)
 		{
@@ -113,7 +119,7 @@ if($validado == true)
 			$errordb=true;
 		}
 	}
-	else 
+	else
 	{
 		 $errorDni=true;
 	}
@@ -138,18 +144,18 @@ if($validado == true)
     <script src="../js/bootstrap-datetimepicker.es.js"></script>
 	<!--script language='javascript' src="../jscripts/funciones.js"></script>
 	<script language='javascript' src="../mod_validacion/validacion.js"></script-->
-  
+
 	<!-- Bootstrap -->
     <script src="../js/bootstrap.min.js"></script>
     <link href="../css/bootstrap.css" rel="stylesheet">
 
     <script type="text/javascript">
-		
+
 		function set_focus()
 		{
 			document.getElementById("txt_nombre_propietario").focus();
 			alert("focus propietario nombre");
-			return (false);	
+			return (false);
 		}
 
     </script>
@@ -166,7 +172,7 @@ if($validado == true)
       <!-- Main component for a primary marketing message or call to action -->
 		<div class="jumbotron">
 			<h4 class="text-center bg-info">Cargar Persona</h4>
-			
+
 			<div class="container">
 				<form id="form1" name="form1" method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" >
 					<div class="row">
@@ -264,49 +270,71 @@ if($validado == true)
 								<div class="panel-body">
 									<form class="form form-signup" role="form">
 										<h4 class="text-center"><img src="../images/icons/propietario.png" alt="Municipalidad Bariloche" align="center" style="margin:0px 0px 0px 0px" height="64" width="64"></h4>
-											
+
 											<div class="form-group">
 												<div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-keyboard-o fa-fw"></i> Nombre*</span>
 													<input name="txt_nombre_propietario" type="text" class="form-control" id="txt_nombre_propietario" value="<?php echo $txt_nombre_propietario;?>"/>
 												</div>
 											</div>
-											
+
 											<div class="form-group">
 												<div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-keyboard-o fa-fw"></i> Apellido*</span>
 													<input name="txt_apellido" type="text" class="form-control" id="txt_apellido" value="<?php echo $txt_apellido;?>"/>
 												</div>
 											</div>
-											
+
 											<div class="form-group">
 											   <div class="input-group">
 												   <span class="input-group-addon"><i class="fa fa-id-card fa-fw"></i> DNI*</span>
 												   <input name="txt_dni" type="text" class="form-control" id="txt_dni" value="<?php echo $txt_dni;?>"/>
 											   </div>
 											</div>
-											
+
+											<div class="form-group" readonly>
+												<div class="input-group">
+													<span class="input-group-addon"><i class="fa fa-calendar-o fa-fw"></i> Fecha nacimiento </span>
+													<div class='input-group date' id='divMiCalendario'>
+														<input name="txt_fecha_nac" type='text' id="txt_fecha_nac" class="form-control" value="" readonly/>
+														<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
+													</div>
+												</div>
+											</div>
+
+											<div class="form-group">
+												<div class="input-group">
+													<span class="input-group-addon"><i class="fa fa-bug fa-fw"></i> Sexo*</span>
+													<div class="col-xs-15 selectContainer">
+														<select class="form-control" id="select_sexo" name="select_sexo">
+															<option value = "m" selected="selected"> M </option>
+															<option value = "f"> F </option>
+														</select>
+													</div>
+												</div>
+											</div>
+
 											<div class="form-group">
 											   <div class="input-group">
-													<span class="input-group-addon"><i class="fa fa-map-signs fa-fw"></i> Domicilio*</span>
+													<span class="input-group-addon"><i class="fa fa-map-signs fa-fw"></i> Calle*</span>
 													<input name="txt_calle" type="text" class="form-control" id="txt_calle" value="<?php echo $txt_calle;?>"/>
 											   </div>
 											</div>
-											
+
 											<div class="form-group">
 											   <div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-hashtag fa-fw"></i> Número*</span>
 													<input name="txt_nro" type="text" class="form-control" id="txt_nro" value="<?php echo $txt_nro;?>"/>
 												</div>
 											</div>
-											
+
 											<div class="form-group">
 											   <div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-map-o fa-fw"></i> Barrio</span>
 													<input name="txt_barrio" type="text" class="form-control" id="txt_barrio" value="<?php echo $txt_barrio;?>"/>
 											   </div>
 											</div>
-											
+
 											<div class="form-group">
 											   <div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-building-o fa-fw"></i> Piso</span>
@@ -320,25 +348,53 @@ if($validado == true)
 													<input name="txt_dpto" type="text" class="form-control" id="txt_dpto" value="<?php echo $txt_dpto;?>"/>
 											   </div>
 											</div>
-											
+
+											<div class="form-group">
+												 <div class="input-group">
+													<span class="input-group-addon"><i class="fa fa-map-o fa-fw"></i> Codigo postal</span>
+													<input name="txt_cp" type="text" class="form-control" id="txt_cp" value="8400"/>
+												 </div>
+											</div>
+
+											<div class="form-group">
+												 <div class="input-group">
+													<span class="input-group-addon"><i class="fa fa-map-o fa-fw"></i> Pais </span>
+													<input name="txt_pais" type="text" class="form-control" id="txt_pais" value="Argentina"/>
+												 </div>
+											</div>
+
+											<div class="form-group">
+												<div class="input-group">
+													<span class="input-group-addon"><i class="fa fa-bug fa-fw"></i> Estado civil*</span>
+													<div class="col-xs-15 selectContainer">
+														<select class="form-control" id="select_ec" name="select_ec">
+															<option value = "soltero" selected="selected"> Soltero/a </option>
+															<option value = "casado"> Casado/a </option>
+															<option value = "divorciado"> Divorciado/a </option>
+															<option value = "viudo"> Viudo/a </option>
+														</select>
+													</div>
+												</div>
+											</div>
+
 											<div class="form-group">
 												<div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-phone fa-fw"></i> Teléfono*</span>
 													<input name="txt_telefono" type="text" class="form-control" id="txt_telefono" value="<?php echo $txt_telefono;?>"/>
 												</div>
-											</div>	
-											
+											</div>
+
 											<div class="form-group">
 												<div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-at fa-fw"></i> Email</span>
 													<input name="txt_email" type="text" class="form-control" id="txt_email" value="<?php echo $txt_email;?>"/>
 												</div>
 											</div>
-										<input name="Submit" type="submit" method="post" class="btn btn-sm btn-primary btn-block" value="GUARDAR" />     
+										<input name="Submit" type="submit" method="post" class="btn btn-sm btn-primary btn-block" value="GUARDAR" />
 									</form>
 								</div>
 							</div>
-							
+
 						</div>
 					</div>
 				</form>
@@ -348,5 +404,11 @@ if($validado == true)
 			<p class="text-center">Direccion de Sistemas - Municipalidad de Bariloche</p>
 		</div>
 	</div>   <!-- Container -->
+
+	<script type="text/javascript">
+	$('#divMiCalendario').datetimepicker({
+      format: 'DD-MM-YYYY'
+    });
+</script>
 </body>
 </html>

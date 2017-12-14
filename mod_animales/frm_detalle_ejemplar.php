@@ -29,6 +29,8 @@ $especie = "";
 $raza = "";
 $pelaje = "";
 $tamanio = "";
+$alzada = "";
+$libreta=false;
 $sexo = "";
 $condicion = "";
 $caracter = "";
@@ -50,6 +52,20 @@ $hidatidosis=false;
 $fechaHidatidosis="";
 $gusanos_redondos=false;
 $fechaGusanos="";
+$anemia=false;
+$fechaAnemia="";
+$influenza=false;
+$fechaInfluenza="";
+$adenitis=false;
+$fechaAdenitis="";
+$encefalomielitis=false;
+$fechaEncefalomielitis="";
+$leucemia=false;
+$fechaLeucemia="";
+$triple=false;
+$fechaTriple="";
+$rabiaFelino=false;
+$fechaRabiaFelino="";
 $nroChip = "";
 $propietarioPrincipal="";
 
@@ -69,6 +85,12 @@ if (!empty($buscar_chip))
 			$id_ejemplar=$row['id_ejemplar'];
 			$nombreEjemplar = $row['nombre'];
 			$anioNacimiento = $row['anio_nacimiento'];
+			$alzada = $row['alzada'];
+
+			if($row['libreta'] == 1)
+			{
+				$libreta = true;
+			}
 
 			$tamanio = $row['tamanio'];
 			$sexo = $row['sexo'];
@@ -93,7 +115,6 @@ if (!empty($buscar_chip))
 			$observaciones = $row['observaciones'];
 			$nroChip = $row['numero_chip'];
 
-
 			$chipeado = sql_buscar_chipeado_animal($row['id_ejemplar']);
 
 			$numeroRowChip = mysql_num_rows($chipeado); // obtenemos el número de filas
@@ -112,7 +133,7 @@ if (!empty($buscar_chip))
 
 					$rowAplicador=mysql_fetch_array($personaAp);
 
-					$chipeador = $rowAplicador['documento'].' '.$rowAplicador['nombre'].' '.$rowAplicador['apellido'];
+					$chipeador = $rowAplicador['DOCUMENTO'].' '.$rowAplicador['NOMBRE'].' '.$rowAplicador['APELLIDO'];
 				}
 			}
 
@@ -149,8 +170,15 @@ if (!empty($buscar_chip))
 
 					if($rowVac['nombre_vacuna'] == "Rabia")
 					{
-						$rabia = true;
-						$fechaRabia = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+						if($especie == "Canina")
+						{
+							$rabia = true;
+							$fechaRabia = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+						}elseif($especie == "Felina")
+						{
+							$rabiaFelino = true;
+							$fechaRabiaFelino = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+						}
 					}
 
 					if($rowVac['nombre_vacuna'] == "Hidatidosis")
@@ -163,6 +191,42 @@ if (!empty($buscar_chip))
 					{
 						$gusanos_redondos = true;
 						$fechaGusanos = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+					}
+
+					if($rowVac['nombre_vacuna'] == "Anemia Infecciosa")
+					{
+						$anemia = true;
+						$fechaAnemia = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+					}
+
+					if($rowVac['nombre_vacuna'] == "Influenza Equina")
+					{
+						$influenza = true;
+						$fechaInfluenza = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+					}
+
+					if($rowVac['nombre_vacuna'] == "Adenitis Equina")
+					{
+						$adenitis = true;
+						$fechaAdenitis = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+					}
+
+					if($rowVac['nombre_vacuna'] == "Encefalomielitis")
+					{
+						$encefalomielitis = true;
+						$fechaEncefalomielitis = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+					}
+
+					if($rowVac['nombre_vacuna'] == "Triple")
+					{
+						$triple = true;
+						$fechaTriple = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+					}
+
+					if($rowVac['nombre_vacuna'] == "Leucemia")
+					{
+						$leucemia = true;
+						$fechaLeucemia = fecha_normal_mysql($rowVac['fecha_aplicacion']);
 					}
 				}
 			}
@@ -595,7 +659,7 @@ function set_focus()
 																	<div class="input-group">
 																		<span class="input-group-addon"><i class="fa fa-user fa-fw"></i> Chip aplicado por: </span>
 
-																		<input name="buscar_propietario" type="text" class="form-control" id="buscar_propietario"  value="<?php echo $chipeador; ?>" disabled="disabled"/>
+																		<input name="txt_chipeador" type="text" class="form-control" id="txt_chipeador"  value="<?php echo $chipeador; ?>" disabled="disabled"/>
 																	</div>
 																</div>
 															</div>
@@ -617,16 +681,16 @@ function set_focus()
 													   		?>
 																<div id="myCarousel" class="carousel slide" data-ride="carousel">
 																	 <!-- Wrapper for slides -->
-																	 <div class="carousel-inner" style=" width:100%; height: 300px !important;">
-																		 
+																	 <div class="carousel-inner" style=" width:100%; height: 350px !important;">
+
 																		 <div class="item active">
 																			 <img width="100%" src="../images/portada.jpg" alt="">
 																		 </div>
 
 																		  <?php while($imagenes=mysql_fetch_array($result_images)){ ?>
-																				
+
 																				<div class="item">
-			 																		 <img width="100%" src="imagenes_ejemplares/<?php echo $imagenes['archivo']; ?>" alt="<?php echo $imagenes['archivo']; ?>">
+			 																		 <img width="95%" src="imagenes_ejemplares/<?php echo $imagenes['archivo']; ?>" alt="<?php echo $imagenes['archivo']; ?>">
 			 																	 </div>
 																			 <?php }?>
 

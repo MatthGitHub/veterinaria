@@ -1,5 +1,5 @@
 <?php
-error_reporting(0);
+
 
 /*------------------------------------ MODULO EJEMPLARES ----------------------------------------*/
 
@@ -8,7 +8,7 @@ function sql_traer_ejemplares()
 {
 	$link_veterinaria = conectarse_mysql_veterinaria();
 
-	$sql ="SELECT `ejemplares`.`nombre`,`ejemplares`.`fk_id_especie`, `ejemplares`.`numero_chip`,`personas`.`documento`,`personas`.`barrio`,`personas`.`calle`,`personas`.`numero`
+	$sql ="SELECT `ejemplares`.`nombre` as nombre_ejemplar,`ejemplares`.`fk_id_especie`, `ejemplares`.`numero_chip`,`personas`.`documento`,`personas`.`barrio`,`personas`.`calle_nocod`,`personas`.`numeracion_calle`,`personas`.`apellido`,`personas`.`nombre`
 	FROM `ejemplares` INNER JOIN (`ejemplares_personas` INNER JOIN `personas` ON `fk_id_persona` = `id_persona`) ON `id_ejemplar` = `fk_id_ejemplar`
 		  ";
 
@@ -45,7 +45,7 @@ function sql_buscar_animal_duplicado($pChip)
 }
 
 // Carga un nuevo ejemplar VER COMO MEJORARLO!
-function sql_insert_ejemplar($nombreEjemplar,$anioNacimiento,$especie,$raza,$pelaje,$tamanio,$alzada,$sexo,$condicion,$caracter,$capturas,$castrado,$fechaCastrado,$observaciones,$nroChip, $fechaChip, $plan, $nro_recibo, $sextuple, $fechaSextuple, $quintuple, $fechaQuintuple, $rabia, $fechaRabia, $hidatidosis, $fechaHidatidosis, $gusanos_redondos, $fechaGusanos, $id_propietario, $dni_chipeador)
+function sql_insert_ejemplar($nombreEjemplar,$anioNacimiento,$especie,$raza,$pelaje,$tamanio,$alzada,$libreta,$sexo,$condicion,$caracter,$capturas,$castrado,$fechaCastrado,$observaciones,$nroChip, $fechaChip, $plan, $nro_recibo, $sextuple, $fechaSextuple, $quintuple, $fechaQuintuple, $rabia, $fechaRabia, $hidatidosis, $fechaHidatidosis, $gusanos_redondos, $fechaGusanos, $anemia, $fechaAnemia, $influenza, $fechaInfluenza, $adenitis, $fechaAdenitis, $encefalomielitis, $fechaEncefalomielitis, $leucemia, $fechaLeucemia, $rabiaFelino, $fechaRabiaFelino, $triple, $fechaTriple, $id_propietario, $nombre_chipeador)
 {
 
 	$fechaChip = fecha_mysql_normal($fechaChip);
@@ -55,6 +55,13 @@ function sql_insert_ejemplar($nombreEjemplar,$anioNacimiento,$especie,$raza,$pel
 	$fechaRabia = fecha_mysql_normal($fechaRabia);
 	$fechaHidatidosis = fecha_mysql_normal($fechaHidatidosis);
 	$fechaGusanos = fecha_mysql_normal($fechaGusanos);
+	$fechaAnemia = fecha_mysql_normal($fechaAnemia);
+	$fechaInfluenza = fecha_mysql_normal($fechaInfluenza);
+	$fechaAdenitis = fecha_mysql_normal($fechaAdenitis);
+	$fechaEncefalomielitis = fecha_mysql_normal($fechaEncefalomielitis);
+	$fechaLeucemia = fecha_mysql_normal($fechaLeucemia);
+	$fechaRabiaFelino = fecha_mysql_normal($fechaRabiaFelino);
+	$fechaTriple = fecha_mysql_normal($fechaTriple);
 
 	$nombreEjemplar = htmlentities(addslashes($nombreEjemplar));
 	$observaciones = htmlentities(addslashes($observaciones));
@@ -87,13 +94,14 @@ function sql_insert_ejemplar($nombreEjemplar,$anioNacimiento,$especie,$raza,$pel
 	$fk_id_pelaje = sql_buscar_id_pelaje($pelaje);
 
 	$sql = "INSERT INTO  `veterinaria`.`ejemplares`
-			(`numero_chip`,`nombre` ,`anio_nacimiento`,`sexo`,`caracter`,`capturas` ,`tamanio` ,`alzada` ,`condicion`,`castrado`,`fecha_castrado`,`observaciones`, `foto_url`,`fk_id_especie`,`fk_id_raza`,`fk_id_pelaje`)
+			(`numero_chip`,`nombre` ,`anio_nacimiento`,`sexo`,`caracter`,`capturas` ,`tamanio` ,`alzada`,`libreta`,`condicion`,`castrado`,`fecha_castrado`,`observaciones`,`fk_id_especie`,`fk_id_raza`,`fk_id_pelaje`)
 			VALUES
-			( '".$nroChip."','".$nombreEjemplar."', '".$anioNacimiento."', '".$sexo."', '".$caracter."', '".$capturas."', '".$tamanio."', '".$alzada."',
+			( '".$nroChip."','".$nombreEjemplar."', '".$anioNacimiento."', '".$sexo."', '".$caracter."', '".$capturas."', '".$tamanio."', '".$alzada."','".$libreta."',
 			 '".$condicion."', '".$castrado."', '".$fechaCastrado."', '".$observaciones."', '".$fk_id_especie."','".$fk_id_raza."',
 			 '".$fk_id_pelaje."')";
 
-	$ejemplar = mysql_query($sql,$link_veterinaria);
+	 $ejemplar = mysql_query($sql,$link_veterinaria);
+
 
 	//Busco el id_ejemplar que acabo de persistir
 	//$sql = "SELECT max(id_ejemplar) as id_ejemplar from ejemplares";
@@ -104,7 +112,11 @@ function sql_insert_ejemplar($nombreEjemplar,$anioNacimiento,$especie,$raza,$pel
 
 	$nroEjemplar = mysql_insert_id($link_veterinaria);
 
-	$chipear = sql_insert_chipeado_ejemplar($nroEjemplar, $fechaChip, $plan, $nro_recibo, $dni_chipeador);
+
+	$chipear = sql_insert_chipeado_ejemplar($nroEjemplar, $fechaChip, $plan, $nro_recibo, $nombre_chipeador);
+
+	/*echo "Chipear:".$chipear;
+	exit();*/
 
 	if(!$chipear)
 	{
@@ -137,8 +149,41 @@ function sql_insert_ejemplar($nombreEjemplar,$anioNacimiento,$especie,$raza,$pel
 		{
 			$vac = sql_insert_vacunas($nroEjemplar,5,$fechaGusanos);
 		}
+		if($leucemia = 'Leucemia' && $fechaLeucemia != "--")
+		{
+			$vac = sql_insert_vacunas($nroEjemplar,11,$fechaLeucemia);
+		}
+		if($rabiaFelino = 'Rabia' && $fechaRabiaFelino != "--")
+		{
+			$vac = sql_insert_vacunas($nroEjemplar,5,$fechaRabiaFelino);
+		}
+		if($triple = 'Triple' && $fechaTriple != "--")
+		{
+			$vac = sql_insert_vacunas($nroEjemplar,10,$fechaTriple);
+		}
+		if($anemia = 'Anemia' && $fechaAnemia != "--")
+		{
+			$vac = sql_insert_vacunas($nroEjemplar,6,$fechaAnemia);
+		}
+		if($influenza = 'Influenza' && $fechaInfluenza != "--")
+		{
+			$vac = sql_insert_vacunas($nroEjemplar,7,$fechaInfluenza);
+		}
+		if($adenitis = 'Adenitis' && $fechaAdenitis != "--")
+		{
+			$vac = sql_insert_vacunas($nroEjemplar,8,$fechaAdenitis);
+		}
+		if($encefalomielitis = 'Encefalomielitis' && $fechaEncefalomielitis != "--")
+		{
+			$vac = sql_insert_vacunas($nroEjemplar,9,$fechaEncefalomielitis);
+		}
 
 		//Propietarios
+		//$propietario = sql_buscar_propietario($id_propietario);
+
+		//$row=mysql_fetch_array($propietario);
+
+		//$id_persona = ($row['id_persona']);
 
 	    $prop = sql_insert_propietario_ejemplar($nroEjemplar, $id_propietario);
 	}
@@ -148,7 +193,7 @@ function sql_insert_ejemplar($nombreEjemplar,$anioNacimiento,$especie,$raza,$pel
 }
 
 // Actualiza un ejemplar especifico.
-function sql_update_ejemplar($id_ejemplar,$nombreEjemplar,$anioNacimiento,$especie,$raza,$pelaje,$tamanio,$sexo,$condicion,$caracter,$capturas,$castrado,$fechaCastrado,$observaciones, $fechaChip, $plan, $nro_recibo, $sextuple, $fechaSextuple, $quintuple, $fechaQuintuple, $rabia, $fechaRabia, $hidatidosis, $fechaHidatidosis, $gusanos_redondos, $fechaGusanos, $id_propietario, $dni_chipeador)
+function sql_update_ejemplar($id_ejemplar,$nombreEjemplar,$anioNacimiento,$alzada,$libreta,$especie,$raza,$pelaje,$tamanio,$sexo,$condicion,$caracter,$capturas,$castrado,$fechaCastrado,$observaciones, $fechaChip, $plan, $nro_recibo, $sextuple, $fechaSextuple, $quintuple, $fechaQuintuple, $rabia, $fechaRabia, $hidatidosis, $fechaHidatidosis, $gusanos_redondos, $fechaGusanos, $anemia, $fechaAnemia, $influenza, $fechaInfluenza, $adenitis, $fechaAdenitis, $encefalomielitis, $fechaEncefalomielitis, $leucemia, $fechaLeucemia, $rabiaFelino, $fechaRabiaFelino, $triple, $fechaTriple, $id_propietario, $nombre_chipeador)
 {
 
 	$fechaChip = fecha_normal_mysql($fechaChip);
@@ -158,6 +203,13 @@ function sql_update_ejemplar($id_ejemplar,$nombreEjemplar,$anioNacimiento,$espec
 	$fechaRabia = fecha_mysql_normal($fechaRabia);
 	$fechaHidatidosis = fecha_mysql_normal($fechaHidatidosis);
 	$fechaGusanos = fecha_mysql_normal($fechaGusanos);
+	$fechaAnemia = fecha_mysql_normal($fechaAnemia);
+	$fechaInfluenza = fecha_mysql_normal($fechaInfluenza);
+	$fechaAdenitis = fecha_mysql_normal($fechaAdenitis);
+	$fechaEncefalomielitis = fecha_mysql_normal($fechaEncefalomielitis);
+	$fechaLeucemia = fecha_mysql_normal($fechaLeucemia);
+	$fechaRabiaFelino = fecha_mysql_normal($fechaRabiaFelino);
+	$fechaTriple = fecha_mysql_normal($fechaTriple);
 
 	$nombreEjemplar = htmlentities(addslashes($nombreEjemplar));
 	$observaciones = htmlentities(addslashes($observaciones));
@@ -191,6 +243,8 @@ function sql_update_ejemplar($id_ejemplar,$nombreEjemplar,$anioNacimiento,$espec
 	$sql = "UPDATE `ejemplares`
 			SET `nombre`='".$nombreEjemplar."',
 			`anio_nacimiento`='".$anioNacimiento."',
+			`alzada`='".$alzada."',
+			`libreta`='".$libreta."',
 			`sexo`='".$sexo."',
 			`caracter`='".$caracter."',
 			`capturas`='".$capturas."',
@@ -204,10 +258,11 @@ function sql_update_ejemplar($id_ejemplar,$nombreEjemplar,$anioNacimiento,$espec
 			`fk_id_pelaje`='".$fk_id_pelaje."'
 			WHERE `id_ejemplar`='".$id_ejemplar."'";
 
+	echo 'sql -->>> '.$sql;
+
 	$ejemplar = mysql_query($sql,$link_veterinaria);
 
-
-	$chipear = sql_update_chipeado_ejemplar($id_ejemplar, $fechaChip, $plan, $nro_recibo, $dni_chipeador);
+	$chipear = sql_update_chipeado_ejemplar($nroEjemplar, $fechaChip, $plan, $nro_recibo, $nombre_chipeador);
 
 	//VACUNAS
 
@@ -231,9 +286,37 @@ function sql_update_ejemplar($id_ejemplar,$nombreEjemplar,$anioNacimiento,$espec
 		{
 			$vac = sql_insert_vacunas($id_ejemplar,4,$fechaHidatidosis);
 		}
-		if($gusanos_redondos = 'Gusanos_redondos' && $fechaGusanos != "--")
+		if($gusanos_redondos = 'Gusanos Redondos' && $fechaGusanos != "--")
 		{
 			$vac = sql_insert_vacunas($id_ejemplar,5,$fechaGusanos);
+		}
+		if($leucemia = 'Leucemia' && $fechaLeucemia != "--")
+		{
+			$vac = sql_insert_vacunas($id_ejemplar,11,$fechaLeucemia);
+		}
+		if($rabiaFelino = 'Rabia' && $fechaRabiaFelino != "--")
+		{
+			$vac = sql_insert_vacunas($id_ejemplar,5,$fechaRabiaFelino);
+		}
+		if($triple = 'Triple' && $fechaTriple != "--")
+		{
+			$vac = sql_insert_vacunas($id_ejemplar,10,$fechaTriple);
+		}
+		if($anemia = 'Anemia Infecciosa' && $fechaAnemia != "--")
+		{
+			$vac = sql_insert_vacunas($id_ejemplar,6,$fechaAnemia);
+		}
+		if($influenza = 'Influenza Equina' && $fechaInfluenza != "--")
+		{
+			$vac = sql_insert_vacunas($id_ejemplar,7,$fechaInfluenza);
+		}
+		if($adenitis = 'Adenitis Equina' && $fechaAdenitis != "--")
+		{
+			$vac = sql_insert_vacunas($id_ejemplar,8,$fechaAdenitis);
+		}
+		if($encefalomielitis = 'Encefalomielitis' && $fechaEncefalomielitis != "--")
+		{
+			$vac = sql_insert_vacunas($id_ejemplar,9,$fechaEncefalomielitis);
 		}
 	}
 
@@ -243,7 +326,13 @@ function sql_update_ejemplar($id_ejemplar,$nombreEjemplar,$anioNacimiento,$espec
 
 	if($deletePropietario)
 	{
-    	$prop = sql_insert_propietario_ejemplar($id_ejemplar, $id_propietario);
+		$propietario = sql_buscar_propietario($id_propietario);
+
+		$row=mysql_fetch_array($propietario);
+
+		$id_persona = ($row['id_persona']);
+
+    $prop = sql_insert_propietario_ejemplar($id_ejemplar, $id_persona);
     }
 
 	return $id_ejemplar;
@@ -251,23 +340,23 @@ function sql_update_ejemplar($id_ejemplar,$nombreEjemplar,$anioNacimiento,$espec
 }
 
 // Asocia a un ejemplar especifico, los datos del chipeado.
-function sql_insert_chipeado_ejemplar($fk_id_ejemplar, $fechaChip, $plan, $nro_recibo, $dni_chipeador)
+function sql_insert_chipeado_ejemplar($fk_id_ejemplar, $fechaChip, $plan, $nro_recibo, $nombre_chipeador)
 {
 
 	$id_persona = "";
 
 	$link_veterinaria = conectarse_mysql_veterinaria();
 
-	$chipeador = sql_buscar_propietario($dni_chipeador);
+	$chipeador = sql_buscar_chipeador($nombre_chipeador);
 
 	$row=mysql_fetch_array($chipeador);
 
-	$id_persona = ($row['id_persona']);
+	$id_persona = ($row['id_chipeador']);
 
 	if($id_persona != "")
 	{
 
-		$sql = "INSERT INTO `veterinaria`.`chipeados` (`fecha_alta`, `plan`, `nro_recibo`, `fk_id_ejemplar`,`fk_id_persona`) VALUES ('".$fechaChip."', '".$plan."', '".$nro_recibo."', '".$fk_id_ejemplar."', '".$id_persona."')";
+		$sql = "INSERT INTO `chipeados`(`fecha_alta`, `plan`, `nro_recibo`, `fk_id_ejemplar`, `fk_id_chipeador`) VALUES ('".$fechaChip."', '".$plan."', '".$nro_recibo."', '".$fk_id_ejemplar."', '".$id_persona."')";
 
 		$chipeado = mysql_query($sql,$link_veterinaria);
 
@@ -281,8 +370,6 @@ function sql_insert_chipeado_ejemplar($fk_id_ejemplar, $fechaChip, $plan, $nro_r
 function sql_update_chipeado_ejemplar($fk_id_ejemplar, $fechaChip, $plan, $nro_recibo/*, $dni_chipeador*/)
 {
 
-	$link_veterinaria = conectarse_mysql_veterinaria();
-
 //lo dejo por si tenemos que modificar el aplicador de chip:
 	//$chipeador = sql_buscar_propietario($dni_chipeador);
 
@@ -292,12 +379,26 @@ function sql_update_chipeado_ejemplar($fk_id_ejemplar, $fechaChip, $plan, $nro_r
 
 /*,			`fk_id_persona` = '".$id_persona."' */
 
+	$id_persona = "";
 
-	$sql = "UPDATE `veterinaria`.`chipeados`
-			SET `fecha_alta` = '".$fechaChip."',
-			`plan` = '".$plan."',
-			`nro_recibo` = '".$nro_recibo."'
-			WHERE `fk_id_ejemplar` = '".$fk_id_ejemplar."' ";
+	$link_veterinaria = conectarse_mysql_veterinaria();
+
+	$chipeador = sql_buscar_chipeador($nombre_chipeador);
+
+	$row=mysql_fetch_array($chipeador);
+
+	$id_persona = ($row['id_chipeador']);
+
+	if($id_persona != "")
+	{
+
+		$sql = "UPDATE `veterinaria`.`chipeados`
+				SET `fecha_alta` = '".$fechaChip."',
+				`plan` = '".$plan."',
+				`nro_recibo` = '".$nro_recibo."',
+				`fk_id_chipeador` = '".$id_persona."'
+				WHERE `fk_id_ejemplar` = '".$fk_id_ejemplar."' ";
+	}
 
 	$chipeado = mysql_query($sql,$link_veterinaria);
 
@@ -383,9 +484,11 @@ function sql_buscar_ejemplar_chip($pNro)
 	$link_veterinaria = conectarse_mysql_veterinaria();
 
 	$sql ="SELECT *
-		   FROM `ejemplares`
-		   WHERE numero_chip =  ".$pNro."
-		  ";
+				FROM ejemplares e
+				JOIN ejemplares_personas ep ON e.id_ejemplar = fk_id_ejemplar
+				JOIN personas p ON ep.fk_id_persona = p.id_persona
+		   WHERE numero_chip =  '$pNro'";
+
 	$ejemplar = mysql_query($sql,$link_veterinaria);
 
 	return $ejemplar;
@@ -705,8 +808,9 @@ function sql_reiniciar_clave_usuario($usuario,$clave){
 /*------------------------            MODULO PERSONAS           -----------------------------------*/
 
 // Crea un nuevo propietario.
-function sql_insert_persona($txt_nombre_propietario,$txt_apellido,$txt_dni,$txt_telefono,$txt_calle,$txt_nro,$txt_barrio,$txt_piso, $txt_dpto, $txt_email)
+function sql_insert_persona($txt_nombre_propietario,$txt_apellido,$txt_dni,$txt_telefono,$txt_calle,$txt_sexo,$txt_nro,$txt_barrio,$txt_piso, $txt_dpto, $txt_email,$txt_ec,$txt_fecha_nac,$txt_pais,$txt_cp)
 {
+  $txt_fecha_nac = fecha_mysql_normal($txt_fecha_nac);
 	$persona = "";
 
 	$txt_calle = htmlentities(addslashes($txt_calle));//Resuelvo problemas de comillas dentro del texto
@@ -718,13 +822,28 @@ function sql_insert_persona($txt_nombre_propietario,$txt_apellido,$txt_dni,$txt_
 
 	$link_veterinaria = conectarse_mysql_veterinaria();
 
-	$sql = "INSERT INTO  `veterinaria`.`personas`
-			(`documento` ,`nombre` ,`apellido` ,`telefono` ,`calle` ,`numero` ,`piso`,`departamento`,`barrio`,`email`)
-			VALUES
-			('".$txt_dni."',  '".$txt_nombre_propietario."', '".$txt_apellido."',  '".$txt_telefono."',  '".$txt_calle."', '".$txt_nro."', '".$txt_piso."','".$txt_dpto."','".$txt_barrio."', '".$txt_email."')";
+	$sql = "INSERT INTO `personas`
+	(`IDENTIFICADOR`, `TIPO_DOCUMENTO`, `DOCUMENTO`, `APELLIDO`,
+		 `NOMBRE`, `SEXO`, `CALLE_NOCOD`, `NUMERACION_CALLE`, `DEPARTAMENTO`,
+		  `PISO`, `BARRIO`, `CODIGO_POSTAL_AUXILIAR`, `CODIGO_CALLE`,`CODIGO_ESTADO_CIVIL`,
+			 `TELEFONO`, `CODIGO_PROVINCIA`, `CODIGO_NACIONALIDAD`, `CODIGO_DGI`,`INGRESOS_BRUTOS`,
+			  `CAJA_JUBILACION`, `CUIT_CUIL`, `FECHA_NACIMIENTO`, `FECHA_FALLECIMIENTO`,`OBSERVACIONES`,
+				 `TELEFONO_MOVIL`, `E_MAIL`, `TORRE`, `CODIGO_POSTAL_AMPLIADO`,`PAIS`,
+				  `FECHA_AC`, `APELLIDO_NOMBRE`, `CODIGO_POSTAL_SUFIJO`, `id_subrogado`, `unificado`)
+					VALUES ('00000',1,'$txt_dni','$txt_apellido',
+									'$txt_nombre_propietario','$txt_sexo','$txt_calle',$txt_nro,'$txt_dpto',
+									$txt_piso,'$txt_barrio','$txt_cp',null,'$txt_ec',
+									'$txt_telefono',null,null,null,null,
+									null,null,'$txt_fecha_nac',null,null,
+									null,'$txt_email',null,null,'Argentina',
+									null,'$txt_apellido $txt_nombre_propietario',null,null,0)";
+
+
 
 	$persona = mysql_query($sql,$link_veterinaria);
-
+	/*echo "SQL: ".$sql."\n";
+	echo "Res: ".$persona;
+	exit();*/
 	return $persona;
 
 }
@@ -734,8 +853,8 @@ function sql_buscar_personas()
 {
 	$link_veterinaria = conectarse_mysql_veterinaria();
 
-	$sql ="SELECT id_persona,documento,nombre,apellido
-		   FROM `personas` ORDER BY documento ASC
+	$sql ="SELECT identificador,documento,nombre,apellido
+		   FROM `personas` LIMIT 100
 		   ";
 	$personas = mysql_query($sql,$link_veterinaria);
 
@@ -780,7 +899,7 @@ function sql_buscar_propietario_ejemplar($pEjemplar)
 
 	$link_veterinaria = conectarse_mysql_veterinaria();
 
-	$sql ="SELECT `id_persona`, `documento`, `nombre`, `apellido`
+	$sql ="SELECT `IDENTIFICADOR`, `documento`, `nombre`, `apellido`
 			FROM `personas`
 			INNER JOIN `ejemplares_personas`
 			ON `personas`.`id_persona` = `ejemplares_personas`.`fk_id_persona`
@@ -798,7 +917,7 @@ function sql_traer_propietarios()
 	$link_veterinaria = conectarse_mysql_veterinaria();
 
 	$sql ="SELECT *
-		   FROM `personas`
+		   FROM `personas` LIMIT 100
 		  ";
 
 	$propietarios = mysql_query($sql,$link_veterinaria);
@@ -864,6 +983,65 @@ function sql_buscar_persona_duplicada($pDni)
 }
 
 /*************************  END MODULO PERSONAS  ********************************/
+/************************* CHIPEADORES ******************************************/
+function sql_insert_chipeador($nombre)
+{
+	$link_veterinaria = conectarse_mysql_veterinaria();
 
+	$sql ="INSERT INTO chipeadores(nombre_chipeador) VALUES('$nombre')";
+	$stmt = mysql_query($sql,$link_veterinaria);
 
+	if($stmt){
+		return true;
+	}else{
+		return false;
+	}
+
+}
+
+function sql_buscar_chipeador($nombre)
+{
+	$link_veterinaria = conectarse_mysql_veterinaria();
+
+	$sql ="SELECT *
+		   FROM `chipeadores`
+		   WHERE nombre_chipeador =  '$nombre'
+		  ";
+
+	$chipeador = mysql_query($sql,$link_veterinaria);
+
+	return $chipeador;
+}
+
+// Busca todos los chipeadores.
+function sql_traer_chipeadores()
+{
+	$link_veterinaria = conectarse_mysql_veterinaria();
+
+	$sql ="SELECT *
+		   FROM `chipeadores` ORDER BY `nombre_chipeador`
+		  ";
+
+	$chipeadores = mysql_query($sql,$link_veterinaria);
+
+	return $chipeadores;
+}
+
+function sql_buscar_chipeador_ejemplar($id_ejemplar)
+{
+	$link_veterinaria = conectarse_mysql_veterinaria();
+
+	$sql ="SELECT `chipeadores`.`id_chipeador`, `chipeadores`.`nombre_chipeador`
+			FROM `chipeados`
+			INNER JOIN `chipeadores`
+			ON `chipeados`.`fk_id_chipeador`=`chipeadores`.`id_chipeador`
+			WHERE `fk_id_ejemplar`= $id_ejemplar
+		  ";
+
+	$chipeador = mysql_query($sql,$link_veterinaria);
+
+	return $chipeador;
+}
+
+/************************* CHIPEADORES ******************************************/
 ?>

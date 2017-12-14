@@ -21,21 +21,16 @@
 				  <li class="dropdown">
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-id-badge fa-fw"></i> Personas<span class="caret"></span></a>
 					  <ul class="dropdown-menu">
-						<?php if(($_SESSION['rol'] > 0)&&($_SESSION['rol'] < 4)){?>
-						<li><a href="../mod_personas/frm_alta_propietario.php">Cargar Persona</a></li>
 						<li><a href="../mod_personas/frm_buscar_propietario.php">Buscar Persona</a></li>
-						<?php }else{ ?>
-							<li><a href="../mod_personas/frm_buscar_propietario.php">Buscar Persona</a></li>
-						<?php } ?>
+						<li><a href="../mod_chipeadores/chipeadores.php">Chipeadores</a></li>
 					  </ul>
 				  </li>
 				  <li class="dropdown">
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-paw fa-fw"></i> Animales<span class="caret"></span></a>
 					  <ul class="dropdown-menu">
 							<?php if(($_SESSION['rol'] > 0)&&($_SESSION['rol'] < 4)){?>
-						  <li><a href="../mod_animales/frm_alta_animal.php">Cargar Animal</a></li>
+						  <li><a href="../mod_personas/personas.php">Cargar Animal</a></li>
 						  <li><a href="../mod_animales/frm_buscar_ejemplar.php">Buscar Animal</a></li>
-							<li><a href="../mod_animales/frm_mod_ejemplar_beta.php">Cargar Foto</a></li>
 							<?php }else{ ?>
 								<li><a href="../mod_animales/frm_buscar_ejemplar.php">Buscar Animal</a></li>
 							<?php } ?>
@@ -45,7 +40,7 @@
 				  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-file-text-o fa-fw"></i> Reportes<span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						<li><a href="../mod_reportes/frm_reporte_por_propietario.php">Reporte ejemplares propietario</a></li>
-						<li><a href="../mod_reportes/frm_reporte_animales_por_barrio.php">Reporte perros por barrio</a></li>
+						<li><a href="../mod_reportes/frm_reporte_animales_por_barrio.php">Reporte ejemplares por barrio</a></li>
 					  </ul>
 				</li>
 

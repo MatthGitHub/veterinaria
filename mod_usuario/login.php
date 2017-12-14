@@ -39,6 +39,7 @@
 			// Inicializamos sesion
 			session_start();
 			// Guardamos una variable
+			$_SESSION['sistema'] = 'veterinaria';
 			$_SESSION['permiso'] = 'autorizado';
 			$_SESSION['rol'] = $rol;
 			$_SESSION['nombre'] =$nombre;

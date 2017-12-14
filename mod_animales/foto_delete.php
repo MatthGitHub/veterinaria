@@ -18,6 +18,7 @@ $sql="delete from ejemplares_fotos where id=".$_GET['id_file'];
 mysql_query($sql,$link);
 mysql_close($link);
 	
-header('Location:frm_mod_ejemplar_beta_2.php?txt_buscar_chip='.$txt_buscar_chip); 
+//header('Location:frm_mod_ejemplar_beta_2.php?txt_buscar_chip='.$txt_buscar_chip); 
+header('Location:frm_mod_ejemplar.php?txt_buscar_chip='.$txt_buscar_chip); 
 
 ?>

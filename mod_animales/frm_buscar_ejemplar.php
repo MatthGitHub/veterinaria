@@ -1,8 +1,8 @@
 
-<?php 
+<?php
 //--------------------------------Inicio de sesion------------------------
 
-include("../lib/sesion.php"); 
+include("../inc/sesion.php");
 if ($_SESSION['permiso'] != 'autorizado' ){
 	$mensaje="Usuario sin permisos";
 	$destino="../index.php";
@@ -12,7 +12,7 @@ if ($_SESSION['permiso'] != 'autorizado' ){
 
 //Parametros - var - librerias
 include("../lib/funciones.php");
-include("../mod_sql/sql.php");	
+include("../mod_sql/sql.php");
 
 //Cargo animales
 $animales = sql_traer_ejemplares();
@@ -27,7 +27,23 @@ $animales = sql_traer_ejemplares();
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="icon" type="image/png" href="../images/icons/logo_vet.png" sizes="16x16">
     <title>Sistema VyZ MSCB</title>
-	
+		<!-- Bootstrap Core CSS -->
+		<link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+		<!-- MetisMenu CSS -->
+		<link href="../vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
+
+		<!-- DataTables CSS -->
+		<link href="../vendor/datatables-plugins/dataTables.bootstrap.css" rel="stylesheet">
+
+		<!-- DataTables Responsive CSS -->
+		<link href="../vendor/datatables-responsive/dataTables.responsive.css" rel="stylesheet">
+
+		<!-- Custom CSS -->
+		<link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+
+		<!-- Custom Fonts -->
+		<link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <!-- Bootstrap -->
     <link href="../css/bootstrap.min.css" rel="stylesheet">
@@ -37,12 +53,12 @@ $animales = sql_traer_ejemplares();
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script language='javascript' src="../js/jquery-1.12.3.js"></script>
     <script language='javascript' src="../js/jquery.dataTables.min.js"></script>
-	
+
 	<script type="text/JavaScript">
-	
+
 	$(document).ready(function() {
-		
-				
+
+
 		$('#animales').DataTable( {
 		  "language": {
 				"lengthMenu": "Mostrar _MENU_ registros por pagina",
@@ -78,7 +94,7 @@ $animales = sql_traer_ejemplares();
 	{
 		document.getElementById("txt_nombre_animal").focus();
 		alert("focus animal nombre");
-		return (false);	
+		return (false);
 	}
 
 	</script>
@@ -89,47 +105,93 @@ $animales = sql_traer_ejemplares();
 	<div class="container">
 		<br>
 			<?php include("../inc/menu.php"); ?>
-			
+
       <!-- Main component for a primary marketing message or call to action -->
-		<div class="jumbotron">		
-		<h4 class="text-center"><img src="../images/icons/animal.png" alt="Municipalidad Bariloche" align="center" style="margin:0px 0px 0px 0px" height="64" width="64"></h4>	
-			<h4 class="text-center bg-info">Listado Animales</h4>	
+		<div class="jumbotron">
+		<h4 class="text-center"><img src="../images/icons/animal.png" alt="Municipalidad Bariloche" align="center" style="margin:0px 0px 0px 0px" height="64" width="64"></h4>
+			<h4 class="text-center bg-info">Listado Animales</h4>
 			<div class="container">
-				<div class="row">	
-					<table id="animales" class="display" cellspacing="0" width="100%">
-						<thead>
-							<th> Nombre </th>
-							<th> Nro Chip </th>
-							<th> Especie </th>
-							<th> Documento Prop. </th>
-							<th> Barrio </th>
-							<th> Calle </th>
-							<th> Numero </th>
-							<th> Ver Detalle </th>
-							<th> Modificar </th>
-						</thead>
-						<tbody>
-							<?php while($anim = mysql_fetch_array($animales)){ 
-								$especie= sql_buscar_especie($anim['fk_id_especie']); 
-								?>
-							<tr class="success">
-								<td> <?php echo $anim['nombre']; ?> </td>
-								<td> <?php echo $anim['numero_chip']; ?> </td>
-								<td> <?php echo $especie ?> </td>
-								<td> <?php echo $anim['documento']; ?> </td>
-								<td> <?php echo $anim['barrio']; ?> </td>
-								<td> <?php echo $anim['calle']; ?> </td>
-								<td> <?php echo $anim['numero']; ?> </td>
-								<td> <button type="submit" id="txt_detalle" name="txt_detalle" class="btn btn-sm btn-primary"  onclick="location.href='frm_detalle_ejemplar.php?txt_buscar_chip=<?php echo $anim['numero_chip']; ?>';"><i class="fa fa-info-circle fa-fw"></i></button> </td>
-								<td> <button type="submit" id="txt_modificar" name="txt_modificar" class="btn btn-sm btn-danger"  onclick="location.href='frm_mod_ejemplar.php?txt_buscar_chip=<?php echo $anim['numero_chip']; ?>';"><i class="fa fa-pencil fa-fw"></i></button> </td>
-							</tr>
-							<?php } ?>
-						</tbody>
-					</table>				
-				</div>	
+				<div class="row">
+						<div class="col-lg-12">
+								<div class="panel panel-default">
+										<div class="panel-heading">
+												Personas
+										</div>
+										<!-- /.panel-heading -->
+										<div class="panel-body">
+												<table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+														<thead>
+																<tr>
+
+																	<th> Nombre </th>
+																	<th> Nro Chip </th>
+																	<th> Especie </th>
+																	<th> Propietario </th>
+																	<th> Documento Prop. </th>
+																	<th> Barrio </th>
+																	<th> Calle </th>
+																	<th> Ver Detalle </th>
+																	<th> Modificar </th>
+
+																</tr>
+														</thead>
+														<tbody>
+																<?php
+
+
+
+																while($anim = mysql_fetch_array($animales)){
+													        $especie= sql_buscar_especie($anim['fk_id_especie']);
+													        ?>
+
+																<tr class="odd gradeX">
+																	<td> <?php echo $anim['nombre_ejemplar']; ?> </td>
+																	<td> <?php echo $anim['numero_chip']; ?> </td>
+																	<td> <?php echo $especie ?> </td>
+																	<td> <?php echo $anim['apellido']." ".$anim['nombre'] ; ?> </td>
+																	<td> <?php echo $anim['documento']; ?> </td>
+																	<td> <?php echo $anim['barrio']; ?> </td>
+																	<td> <?php echo $anim['calle']; ?> </td>
+																	<td> <button type="submit" id="txt_detalle" name="txt_detalle" class="btn btn-primary"  onclick="location.href='frm_detalle_ejemplar.php?txt_buscar_chip=<?php echo $anim['numero_chip']; ?>';"><i class="fa fa-info-circle fa-fw"></i></button> </td>
+																	<td> <button type="submit" id="txt_modificar" name="txt_modificar" class="btn btn-danger"  onclick="location.href='frm_mod_ejemplar.php?txt_buscar_chip=<?php echo $anim['numero_chip']; ?>';"><i class="fa fa-pencil fa-fw"></i></button> </td>
+																</tr>
+																<?php } ?>
+														</tbody>
+												</table>
+												<!-- /.table-responsive -->
+
+										</div>
+										<!-- /.panel-body -->
+								</div>
+								<!-- /.panel -->
+						</div>
+						<!-- /.col-lg-12 -->
+				</div>
 			</div><!-- Container 1 -->
-					
+
 		</div> <!-- Jumbotron -->
 	</div> <!-- Container -->
 </body>
+
+<script src="../vendor/metisMenu/metisMenu.min.js"></script>
+
+<!-- DataTables JavaScript -->
+<script src="../vendor/datatables/js/jquery.dataTables.min.js"></script>
+<script src="../vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
+<script src="../vendor/datatables-responsive/dataTables.responsive.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="../dist/js/sb-admin-2.js"></script>
+
+<!-- Page-Level Demo Scripts - Tables - Use for reference -->
+<script>
+$(document).ready(function() {
+$('#dataTables-example').DataTable( {
+responsive : true,
+		"language": {
+				"url": "../inc/spanish.json"
+			}
+	} );
+} );
+</script>
 </html>

@@ -1,10 +1,9 @@
-
 <?php
 error_reporting(0);
 
 //--------------------------------Inicio de sesion------------------------
 
-include("../lib/sesion.php");
+include("../inc/sesion.php");
 if ($_SESSION['permiso'] != 'autorizado' ){
 	$mensaje="Usuario sin permisos";
 	$destino="../index.php";
@@ -16,88 +15,226 @@ if ($_SESSION['permiso'] != 'autorizado' ){
 include("../lib/funciones.php");
 include("../mod_sql/sql.php");
 
-/*$stmtP = sql_buscar_personas();
+// CARGO LA PAGINA CON LO QUE VIENE DE LA BUSQUEDA
 
-//Si hay resultados...
-if (mysql_num_rows($stmtP) > 0){
-
-while($fila = mysql_fetch_assoc($stmtP)){
-		 // se recoge la información según la vamos a pasar a la variable de javascript
-				 $texto .= '"'.$fila['documento'].' '.$fila['nombre'].' '.$fila['apellido'].'",';
-	}
-
-}else{
-		$texto = "NO HAY RESULTADOS EN LA BBDD";
-}*/
-
-//Capturo dni encontrado
-$buscar_chip = $_GET['txt_buscar_chip'];
-
-//Inicializo variables
-
-$valNombre=false;
-$valFechaChip=false;
-$valPlan=false;
-$valAnioNac=false;
-$valAnioNacNum=false;
-$valEspecie=false;
-$valSexo=false;
-$valCondicion=false;
-$valCapturas=false;
-$valCapturasNum=false;
-$valCastrado=false;
-$valFechaCastrado=false;
-$valnroRecibo=false;
-$valnroReciboNum=false;
-$valNroChip=false;
-$valNroChipNum=false;
-$valSextuple=false;
-$valQuintuple=false;
-$valRabia=false;
-$valHidatidosis=false;
-$valGusanos=false;
-$valSextupleNum =false;
-$valQuintupleNum=false;
-$valHidatidosisNum=false;
-$valRabiaNum=false;
-$valGusanosNum =false;
-$valPropietario=false;
-$validadoAnimal = false;
-$successAnimal = false;
-$errorEjemplar = false;
-$errorCarga = false;
-
-$propMostrar="";
-
-//Cargo especies
-$especies = sql_buscar_especies();
-
-//Cargo pelajes
-$pelajes= sql_traer_pelajes();
-
-//Cargo propietarios
-$propietarios = sql_traer_propietarios();
-
-//Capturo variables
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-	$ejemplar = sql_buscar_ejemplar_chip($buscar_chip);
+	//Capturo chip
+	$buscar_chip = $_POST['txt_buscar_chip'];
 
-	$numeroRow = mysql_num_rows($ejemplar); // obtenemos el número de filas
-
-	if ($ejemplar && $numeroRow > 0)
+	if (!empty($buscar_chip))
 	{
-		while ($row=mysql_fetch_array($ejemplar))
-		{
-			$id_ejemplar = $row['id_ejemplar'];
-		}
-	}
+		$ejemplar = sql_buscar_ejemplar_chip($buscar_chip);
 
+		$numeroRow = mysql_num_rows($ejemplar); // obtenemos el número de filas
+
+		if ($ejemplar && $numeroRow > 0)
+		{
+			while ($row=mysql_fetch_array($ejemplar))
+			{
+				$id_ejemplar = $row['id_ejemplar'];
+				
+				$propMostrar = $row['DOCUMENTO']." ".$row['NOMBRE']." ".$row['APELLIDO'];
+				$id_persona = $row['id_persona'];
+
+				$nombreEjemplar = $row['nombre'];
+				$anioNacimiento = $row['anio_nacimiento'];
+				$alzada = $row['alzada'];
+				
+				if($row['libreta'] == 1)
+				{
+					$libreta = true;
+				}
+
+				$tamanio = $row['tamanio'];
+				//$pTamanio = $tamanio;
+
+				$sexo = $row['sexo'];
+				//$pSexo = $sexo;
+
+				$condicion = $row['condicion'];
+				//$pCondicion = $condicion;
+
+				$caracter = $row['caracter'];
+				//$pCaracter = $caracter;
+
+				$capturas = $row['capturas'];
+
+				if($row['castrado'] == 0)
+				{
+					$castrado = "No";
+				}elseif($row['castrado'] == 1)
+				{
+					$castrado = "Si";
+				}
+
+				//$pCastrado = $castrado;
+
+				if($row['fecha_castrado'] != '0000-00-00')
+				{
+					$fechaCastrado = fecha_normal_mysql($row['fecha_castrado']);
+				}
+
+				$observaciones = $row['observaciones'];
+				$nroChip = $row['numero_chip'];
+
+				$chipeado = sql_buscar_chipeado_animal($row['id_ejemplar']);
+
+				$numeroRowChip = mysql_num_rows($chipeado); // obtenemos el número de filas
+
+				if ($chipeado && $numeroRowChip > 0)
+				{
+					while ($rowC=mysql_fetch_array($chipeado))
+					{
+						if($rowC['fecha_alta'] != '')
+						{
+							$fechaChip = fecha_normal_mysql($rowC['fecha_alta']);
+						}
+
+						$nroRecibo = $rowC['nro_recibo'];
+						$plan = $rowC['plan'];
+						//$pPlan = $plan;
+
+					}
+				}
+
+				//Busco Especie
+				$especie = sql_buscar_especies_por_id($row['fk_id_especie']);
+				//$pEspecie = $especie;
+
+				//Cargo combo razas, en base a la especie
+				$razas = sql_buscar_razas($row['fk_id_especie']);
+
+				//Busco Raza
+				$raza = sql_buscar_raza_por_id($row['fk_id_raza']);
+			//	$pRaza = $raza;
+
+				//Busco Pelaje
+				$pelaje = sql_buscar_pelaje_por_id($row['fk_id_pelaje']);
+			//	$pPelaje = $pelaje;
+
+				$persona_chip = sql_buscar_chipeador_ejemplar($id_ejemplar);
+
+				if ($persona_chip)
+				{
+					while ($row=mysql_fetch_array($persona_chip))
+					{
+						$nombre_chipeador = $row['nombre_chipeador'];
+					}
+				}
+
+			//	$pNombre_chipeador = $nombre_chipeador;
+
+				//VACUNAS
+
+				$vacunas = sql_traer_vacunas_ejemplar($row['id_ejemplar']);
+
+				$numeroRowVacunas = mysql_num_rows($vacunas); // obtenemos el número de filas
+
+				if ($vacunas && $numeroRowVacunas > 0)
+				{
+					while ($rowVac=mysql_fetch_array($vacunas))
+					{
+						if($rowVac['nombre_vacuna'] == "Sextuple")
+						{
+							$sextuple = $rowVac['nombre_vacuna'];
+							$fechaSextuple = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+						}
+
+						if($rowVac['nombre_vacuna'] == "Quintuple")
+						{
+							$quintuple = $rowVac['nombre_vacuna'];
+							$fechaQuintuple = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+						}
+
+						if($rowVac['nombre_vacuna'] == "Rabia")
+						{
+							$rabia = $rowVac['nombre_vacuna'];
+							$fechaRabia = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+						}
+
+						if($rowVac['nombre_vacuna'] == "Hidatidosis")
+						{
+							$hidatidosis = $rowVac['nombre_vacuna'];
+							$fechaHidatidosis = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+						}
+
+						if($rowVac['nombre_vacuna'] == "Gusanos Redondos")
+						{
+							$gusanos_redondos = $rowVac['nombre_vacuna'];
+							$fechaGusanos = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+						}
+
+						if($rowVac['nombre_vacuna'] == "Anemia Infecciosa")
+						{
+							$anemia = $rowVac['nombre_vacuna'];;
+							$fechaAnemia = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+						}
+
+						if($rowVac['nombre_vacuna'] == "Influenza Equina")
+						{
+							$influenza = $rowVac['nombre_vacuna'];;
+							$fechaInfluenza = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+						}
+
+						if($rowVac['nombre_vacuna'] == "Adenitis Equina")
+						{
+							$adenitis = $rowVac['nombre_vacuna'];;
+							$fechaAdenitis = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+						}
+
+						if($rowVac['nombre_vacuna'] == "Encefalomielitis")
+						{
+							$encefalomielitis = $rowVac['nombre_vacuna'];;
+							$fechaEncefalomielitis = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+						}
+
+						if($rowVac['nombre_vacuna'] == "Triple")
+						{
+							$triple = $rowVac['nombre_vacuna'];;
+							$fechaTriple = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+						}
+
+						if($rowVac['nombre_vacuna'] == "Leucemia")
+						{
+							$leucemia = $rowVac['nombre_vacuna'];;
+							$fechaLeucemia = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+						}
+					}
+				}
+
+			}
+			$buscar_chip = "";
+		}
+	}else{
+			$errorCarga = true;
+		}
+
+}
+
+function test_input($data) {
+  $data = trim($data);
+  $data = stripslashes($data);
+  $data = htmlspecialchars($data);
+  return $data;
+}
+
+// CUANDO DAN GUARDAR VALIDO Y PERSISTO
+
+if(isset($_POST['guardar_ejemplar']))
+{
 	$nombreEjemplar = test_input($_POST['txt_nombre_animal']);
 
-	$fechaChip = $_POST['txt_fecha_chip'];
+	$alzada = $_POST['txt_alzada'];
 
-	$urlFoto =  test_input($_POST['txt_foto_carnet']);
+	$libreta = $_POST['libreta'];
+
+	if($libreta == 'Libreta')
+	{
+		$libreta = true;
+	}
+
+	$fechaChip = $_POST['txt_fecha_chip'];
 
 	$anioNacimiento =  test_input($_POST['txt_anio_animal']);
 
@@ -109,40 +246,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	$nroRecibo = test_input($_POST['txt_nro_recibo']);
 
+	$propMostrar = test_input($_POST['txt_propMostrar']);
+
+	$id_persona = test_input($_POST['txt_id_propietario']);
+
+	$id_ejemplar = test_input($_POST['txt_id_ejemplar']);
+
 	//COMBOS
 
 	//capturo especie seleccionada y parametros cargados
-	$valor = explode('.',$_POST['select_especie']);
-	$especie = $valor[0];
+	$especie = $_POST['select_especie'];
+	
+	$raza = $_POST['select_raza'];
+	
 
-	$valor = explode('.',$_POST['select_raza']);
-	$raza = $valor[0];
+	$pelaje = $_POST['select_pelaje'];
 
-	$valor = explode('.',$_POST['select_pelaje']);
-	$pelaje = $valor[0];
 
-	$valor = explode('.',$_POST['select_tamanio']);
-	$tamanio = $valor[0];
+	$tamanio = $_POST['select_tamanio'];
 
-	$valor = explode('.',$_POST['select_sexo']);
-	$sexo = $valor[0];
 
-	$valor = explode('.',$_POST['select_condicion']);
-	$condicion = $valor[0];
+	$sexo = $_POST['select_sexo'];
 
-	$valor = explode('.',$_POST['select_caracter']);
-	$caracter = $valor[0];
 
-	$valor = explode('.',$_POST['select_castrado']);
-	$castrado = $valor[0];
+	$condicion = $_POST['select_condicion'];
 
-	$valor = explode('.',$_POST['select_plan']);
-	$plan = $valor[0];
 
-	$valor = explode('.',$_POST['select_propietarios']);
-	$propietarioPrincipal = $valor[0];
+	$caracter = $_POST['select_caracter'];
 
-	$chipeador = $_POST['buscar_propietario'];
+
+	$castrado = $_POST['select_castrado'];
+
+
+	$plan = $_POST['select_plan'];
+
+
+	$nombre_chipeador = $_POST['select_chipeadores'];
+
 
 	if (isset($_POST['sextuple']) && $_POST['sextuple'] == 'Sextuple')
 	{
@@ -225,357 +365,131 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		}
 	}
 
-	if($nombreEjemplar == "")
+
+	if (isset($_POST['anemia']) && $_POST['anemia'] == 'Anemia')
 	{
-		$valNombre=true;
-	}elseif($fechaChip =="")
+		if(isset($_POST['txt_fecha_anemia']) && $_POST['txt_fecha_anemia']!="")
+		{
+			if(!is_numeric($_POST['txt_fecha_anemia']))
+			{
+				$anemia='Anemia Infecciosa';
+				$fechaAnemia=test_input($_POST['txt_fecha_anemia']);
+			}else{
+				$valAnemiaNum=true;
+			}
+		}else{
+			$valAnemia=true;
+		}
+	}
+
+	if (isset($_POST['influenza']) && $_POST['influenza'] == 'Influenza')
 	{
-		$valFechaChip=true;
-	}elseif($plan=="" || $plan=="Seleccione un plan de chipeado")
+		if(isset($_POST['txt_fecha_influenza']) && $_POST['txt_fecha_influenza']!="")
+		{
+			if(!is_numeric($_POST['txt_fecha_influenza']))
+			{
+				$influenza='Influenza Equina';
+				$fechaInfluenza=test_input($_POST['txt_fecha_influenza']);
+			}else{
+				$valInfluenzaNum=true;
+			}
+		}else{
+			$valInfluenza=true;
+		}
+	}
+
+	if (isset($_POST['adenitis']) && $_POST['adenitis'] == 'Adenitis')
 	{
-		$valPlan=true;
-	}elseif($anioNacimiento=="")
+		if(isset($_POST['txt_fecha_adenitis']) && $_POST['txt_fecha_adenitis']!="")
+		{
+			if(!is_numeric($_POST['txt_fecha_adenitis']))
+			{
+				$adenitis='Adenitis Equina';
+				$fechaAdenitis=test_input($_POST['txt_fecha_adenitis']);
+			}else{
+				$valAdenitisNum=true;
+			}
+		}else{
+			$valAdenitis=true;
+		}
+	}
+
+	if (isset($_POST['encefalomielitis']) && $_POST['encefalomielitis'] == 'Encefalomielitis')
 	{
-		$valAnioNac=true;
-	}elseif(!is_numeric($anioNacimiento))
+		if(isset($_POST['txt_fecha_encefalomielitis']) && $_POST['txt_fecha_encefalomielitis']!="")
+		{
+			if(!is_numeric($_POST['txt_fecha_encefalomielitis']))
+			{
+				$encefalomielitis='Encefalomielitis';
+				$fechaEncefalomielitis=test_input($_POST['txt_fecha_encefalomielitis']);
+			}else{
+				$valEncefalomielitisNum=true;
+			}
+		}else{
+			$valEncefalomielitis=true;
+		}
+	}
+
+	if (isset($_POST['triple']) && $_POST['triple'] == 'Triple')
 	{
-		$valAnioNacNum = true;
-	}elseif($especie=="" || $especie=="Seleccione una especie")
+		if(isset($_POST['txt_fecha_triple']) && $_POST['txt_fecha_triple']!="")
+		{
+			if(!is_numeric($_POST['txt_fecha_triple']))
+			{
+				$triple='Triple';
+				$fechaTriple=test_input($_POST['txt_fecha_triple']);
+			}else{
+				$valTripleNum=true;
+			}
+		}else{
+			$valTriple=true;
+		}
+	}
+
+
+	if (isset($_POST['leucemia']) && $_POST['leucemia'] == 'Leucemia')
 	{
-		$valEspecie = true;
-	}elseif($sexo=="" || $sexo=="Seleccione un sexo")
-	{
-		$valSexo = true;
-	}elseif($condicion=="" || $condicion=="Seleccione una condición")
-	{
-		$valCondicion = true;
-	}elseif($capturas=="")
-	{
-		$valCapturas = true;
-	}elseif(!is_numeric($capturas))
-	{
-		$valCapturasNum = true;
-	}elseif($castrado=="" || $castrado=="¿Castrado?")
-	{
-		$valCastrado = true;
-	}elseif($castrado== 'Si' && $fechaCastrado=="")
+		if(isset($_POST['txt_fecha_leucemia']) && $_POST['txt_fecha_leucemia']!="")
+		{
+			if(!is_numeric($_POST['txt_fecha_leucemia']))
+			{
+				$leucemia='Leucemia';
+				$fechaLeucemia=test_input($_POST['txt_fecha_leucemia']);
+			}else{
+				$valLeucemiaNum=true;
+			}
+		}else{
+			$valLeucemia=true;
+		}
+	}
+
+	$file_name= $_FILES['foto_ejemplar']['name'];
+	$file= $_FILES['foto_ejemplar']['tmp_name'];
+
+	if($castrado == 'Si' && $fechaCastrado == "")
 	{
 		$valFechaCastrado = true;
-	}elseif($valSextuple == true || $valQuintuple == true || $valHidatidosis == true || $valRabia == true || $valGusanos == true)
+	}elseif($valSextuple == true || $valQuintuple == true || $valHidatidosis == true || $valRabia == true || $valGusanos == true
+		|| $valAnemia == true || $valLeucemia == true || $valEncefalomielitis == true || $valTriple == true || $valRabiaFelino
+		|| $valInfluenza == true || $valAdenitis == true)
 	{
 		//entra aca, más abajo pone el cartel segun que vacuna está mal completada.
-	}elseif($valSextupleNum == true || $valQuintupleNum == true || $valHidatidosisNum == true || $valRabiaNum == true || $valGusanosNum == true)
+	}elseif($valSextupleNum == true || $valQuintupleNum == true || $valHidatidosisNum == true || $valRabiaNum == true || $valGusanosNum == true
+		|| $valAnemiaNum == true || $valLeucemiaNum == true || $valEncefalomielitisNum == true || $valTripleNum == true || $valRabiaFelinoNum
+		|| $valInfluenzaNum == true || $valAdenitisNum == true)
 	{
 		//entra aca, más abajo pone el cartel segun que vacuna está mal completada.
-	}elseif($nroRecibo=="")
-	{
-		$valnroRecibo = true;
-	}elseif(!is_numeric($nroRecibo))
-	{
-		$valnroReciboNum = true;
-	}elseif(!is_numeric($propietarioPrincipal))
-	{
-		$valPropietario = true;
 	}else{
 		$validadoAnimal=true;
 	}
 
-}
-//COMBOS
-
-//capturo especie seleccionada y parametros cargados
-$valor = explode('.',$_POST['select_especie']);
-$pEspecie = $valor[0];
-
-$valor = explode('.',$_POST['select_raza']);
-$pRaza = $valor[0];
-
-$valor = explode('.',$_POST['select_pelaje']);
-$pPelaje = $valor[0];
-
-$valor = explode('.',$_POST['select_tamanio']);
-$pTamanio = $valor[0];
-
-$valor = explode('.',$_POST['select_sexo']);
-$pSexo = $valor[0];
-
-$valor = explode('.',$_POST['select_condicion']);
-$pCondicion = $valor[0];
-
-$valor = explode('.',$_POST['select_caracter']);
-$pCaracter = $valor[0];
-
-$valor = explode('.',$_POST['select_castrado']);
-$pCastrado = $valor[0];
-
-$valor = explode('.',$_POST['select_plan']);
-$pPlan = $valor[0];
-
-$valor = explode('.',$_POST['select_propietarios']);
-$propietarioPrincipal = $valor[0];
-
-$chipeador = $_POST['buscar_propietario'];
-
-//$campos_chip = explode(" ", $chipeador);
-//echo trim ($campos_chip[0]); // dni
-
-//Especie
-if ( $pEspecie) {
-	$especie = $pEspecie;
-}
-else {
-	$pEspecie = "Seleccione una especie...";
-}
-
-//busco id especie
-$pId_especie = sql_buscar_id_especie($pEspecie);
-
-//Cargo combo razas, en base a la especie
-$razas = sql_buscar_razas($pId_especie);
-
-
-if ($pRaza) {
-	$raza = $pRaza;
-}
-else {
-	$pRaza = "Seleccione una raza...";
-}
-
-//Pelaje
-if ( $pPelaje) {
-	$pelaje = $pPelaje;
-}
-else {
-	$pPelaje = "Seleccione un pelaje...";
-}
-
-//Tamaño
-if ( $pTamanio) {
-	$tamanio = $pTamanio;
-}
-else {
-	$pTamanio = "Seleccione un tamaño...";
-}
-
-//Sexo
-if ( $pSexo) {
-	$sexo = $pSexo;
-}
-else {
-	$pSexo = "Seleccione un sexo...";
-}
-
-//Condicion
-if ( $pCondicion) {
-	$condicion = $pCondicion;
-}
-else {
-	$pCondicion = "Seleccione una condición...";
-}
-
-//Caracter
-if ( $pCaracter) {
-	$caracter = $pCaracter;
-}
-else {
-	$pCaracter = "Seleccione un carácter...";
-}
-
-//Castrado
-if ( $pCastrado) {
-	$castrado = $pCastrado;
-}
-else {
-	$pCastrado = "¿Castrado?";
-}
-
-//Planes
-if ( $pPlan) {
-	$plan = $pPlan;
-}
-else {
-	$pPlan = "Seleccione un plan de chipeado...";
-}
-
-
-function test_input($data) {
-  $data = trim($data);
-  $data = stripslashes($data);
-  $data = htmlspecialchars($data);
-  return $data;
-}
-
-
-$successAnimal = false;
-
-if($validadoAnimal == true)
-{
-	$fk_id_ejemplar = sql_update_ejemplar($id_ejemplar,$nombreEjemplar,$anioNacimiento,$especie,$raza,$pelaje,$tamanio,$sexo,$condicion,$caracter,$capturas,$castrado,$fechaCastrado,$observaciones, $fechaChip, $plan, $urlFoto, $nroRecibo, $sextuple, $fechaSextuple, $quintuple, $fechaQuintuple, $rabia, $fechaRabia, $hidatidosis, $fechaHidatidosis, $gusanos_redondos, $fechaGusanos, $propietarioPrincipal/*, $campos_chip[0]*/);
-
-	if (!$fk_id_ejemplar)
+	if($validadoAnimal == true)
 	{
-		$errorEjemplar = true;
-	}
-	else{
 
-		$successAnimal = true;
+
 	}
+
 }
-
-//#########################################LLAMO A BUSCAR EJEMPLAR POR NRO################################
-
-if (!empty($buscar_chip))
-{
-	$ejemplar = sql_buscar_ejemplar_chip($buscar_chip);
-
-	$numeroRow = mysql_num_rows($ejemplar); // obtenemos el número de filas
-
-	if ($ejemplar && $numeroRow > 0)
-	{
-		while ($row=mysql_fetch_array($ejemplar))
-		{
-			$id_ejemplar = $row['id_ejemplar'];
-
-			$nombreEjemplar = $row['nombre'];
-			$urlFoto =  "";
-			$anioNacimiento = $row['anio_nacimiento'];
-
-			$tamanio = $row['tamanio'];
-			$pTamanio = $tamanio;
-
-			$sexo = $row['sexo'];
-			$pSexo = $sexo;
-
-			$condicion = $row['condicion'];
-			$pCondicion = $condicion;
-
-			$caracter = $row['caracter'];
-			$pCaracter = $caracter;
-
-			$capturas = $row['capturas'];
-
-			if($row['castrado'] == 0)
-			{
-				$castrado = "No";
-			}elseif($row['castrado'] == 1)
-			{
-				$castrado = "Si";
-			}
-
-			$pCastrado = $castrado;
-
-			if($row['fecha_castrado'] != '0000-00-00')
-			{
-				$fechaCastrado = fecha_normal_mysql($row['fecha_castrado']);
-			}
-
-			$observaciones = $row['observaciones'];
-			$nroChip = $row['numero_chip'];
-
-
-			$chipeado = sql_buscar_chipeado_animal($row['id_ejemplar']);
-
-			$numeroRowChip = mysql_num_rows($chipeado); // obtenemos el número de filas
-
-			if ($chipeado && $numeroRowChip > 0)
-			{
-				while ($rowC=mysql_fetch_array($chipeado))
-				{
-					if($rowC['fecha_alta'] != '')
-					{
-						$fechaChip = fecha_normal_mysql($rowC['fecha_alta']);
-					}
-
-					$nroRecibo = $rowC['nro_recibo'];
-					$plan = $rowC['plan'];
-					$pPlan = $plan;
-					$aplicador = $rowC['fk_id_persona'];
-
-					$personaAp = sql_buscar_persona_id($aplicador);
-
-					$rowAplicador=mysql_fetch_array($personaAp);
-
-					$chipeador = $rowAplicador['documento'].' '.$rowAplicador['nombre'].' '.$rowAplicador['apellido'];
-				}
-			}
-
-			//Busco Especie
-			$especie = sql_buscar_especies_por_id($row['fk_id_especie']);
-			$pEspecie = $especie;
-
-			//Cargo combo razas, en base a la especie
-			$razas = sql_buscar_razas($row['fk_id_especie']);
-
-			//Busco Raza
-			$raza = sql_buscar_raza_por_id($row['fk_id_raza']);
-			$pRaza = $raza;
-
-			//Busco Pelaje
-			$pelaje = sql_buscar_pelaje_por_id($row['fk_id_pelaje']);
-			$pPelaje = $pelaje;
-
-			//VACUNAS
-
-			$vacunas = sql_traer_vacunas_ejemplar($row['id_ejemplar']);
-
-			$numeroRowVacunas = mysql_num_rows($vacunas); // obtenemos el número de filas
-
-			if ($vacunas && $numeroRowVacunas > 0)
-			{
-				while ($rowVac=mysql_fetch_array($vacunas))
-				{
-					if($rowVac['nombre_vacuna'] == "Sextuple")
-					{
-						$sextuple = $rowVac['nombre_vacuna'];
-						$fechaSextuple = fecha_normal_mysql($rowVac['fecha_aplicacion']);
-					}
-
-					if($rowVac['nombre_vacuna'] == "Quintuple")
-					{
-						$quintuple = $rowVac['nombre_vacuna'];
-						$fechaQuintuple = fecha_normal_mysql($rowVac['fecha_aplicacion']);
-					}
-
-					if($rowVac['nombre_vacuna'] == "Rabia")
-					{
-						$rabia = $rowVac['nombre_vacuna'];
-						$fechaRabia = fecha_normal_mysql($rowVac['fecha_aplicacion']);
-					}
-
-					if($rowVac['nombre_vacuna'] == "Hidatidosis")
-					{
-						$hidatidosis = $rowVac['nombre_vacuna'];
-						$fechaHidatidosis = fecha_normal_mysql($rowVac['fecha_aplicacion']);
-					}
-
-					if($rowVac['nombre_vacuna'] == "Gusanos Redondos")
-					{
-						$gusanos_redondos = $rowVac['nombre_vacuna'];
-						$fechaGusanos = fecha_normal_mysql($rowVac['fecha_aplicacion']);
-					}
-				}
-			}
-
-			$propietario = sql_buscar_propietario_ejemplar($row['id_ejemplar']);
-
-			$numeroRowPropietario = mysql_num_rows($propietario); // obtenemos el número de filas
-
-			if ($propietario && $numeroRowPropietario > 0)
-			{
-				while ($rowProp=mysql_fetch_array($propietario))
-				{
-					$propietarioPrincipal=$rowProp['id_persona'];
-					$id_persona = $propietarioPrincipal;
-					$propMostrar = $rowProp['documento']." ".$rowProp['nombre']." ".$rowProp['apellido'];
-
-				}
-			}
-		}
-		$buscar_chip = "";
-	}
-}else{
-		$errorCarga = true;
-	}
 
 
 ?>
@@ -806,42 +720,10 @@ if (!empty($buscar_chip))
 		<div class="jumbotron">
 			<h4 class="text-center bg-info"><i class="fa fa-pencil-square-o fa-fw"></i> Modificar Animal</h4>
 			<div class="container">
-				<form id="frm_mod_ejemplar" name="frm_mod_ejemplar" method="post" onsubmit="" action="<?php $_SERVER["PHP_SELF"];?>" >
+				<form  enctype="multipart/form-data" id="frm_mod_ejemplar" name="frm_mod_ejemplar" method="post" onsubmit="" action="<?php $_SERVER["PHP_SELF"];?>" >
 
 						<?php
-							if($valNombre == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>El NOMBRE no puede estar vacio.</div>
-								";
-								$valNombre = false;
-							}elseif($valFechaChip == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>La FECHA de chipeado no puede estar vacia.</div>
-								";
-								$valFechaChip = false;
-							}elseif($valPlan == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>Debe seleccionar un Plan.</div>
-								";
-								$valPlan = false;
-							}elseif($valAnioNac == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>El AÑO de nacimiento no puede estar vacio.</div>
-								";
-								$valAnioNac = false;
-							}elseif($valAnioNacNum == true){
+							if($valAnioNacNum == true){
 								echo "
 									<div class='alert alert-danger-alt alert-dismissable'>
 									<span class='glyphicon glyphicon-exclamation-sign'></span>
@@ -849,47 +731,7 @@ if (!empty($buscar_chip))
 									×</button>El AÑO de nacimiento debe ser un numero.</div>
 								";
 								$valAnioNacNum = false;
-							}elseif($valEspecie == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>Debe seleccionar una especie.</div>
-								";
-								$valEspecie = false;
-							}elseif($valSexo == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>Debe seleccionar un sexo.</div>
-								";
-								$valSexo = false;
-							}elseif($valCondicion == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>Debe seleccionar una condicion.</div>
-								";
-								$valCondicion = false;
-							}elseif($valCapturas == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>Debe indicar cantidad de capturas.</div>
-								";
-								$valCapturas = false;
-							}elseif($valCapturasNum == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>Las capturas debe ser un numero.</div>
-								";
-								$valCapturasNum = false;
-							}elseif($valSextuple == true || $valQuintuple == true || $valHidatidosis == true || $valRabia == true || $valGusanos == true){
+							}elseif($pEspecie == "Canina" && ($valSextuple == true || $valQuintuple == true || $valHidatidosis == true || $valRabia == true || $valGusanos == true)){
 								echo "
 									<div class='alert alert-danger-alt alert-dismissable'>
 									<span class='glyphicon glyphicon-exclamation-sign'></span>
@@ -901,7 +743,7 @@ if (!empty($buscar_chip))
 								$valHidatidosis = false;
 								$valRabia = false;
 								$valGusanos = false;
-							}elseif($valSextupleNum == true || $valQuintupleNum == true || $valHidatidosisNum == true || $valRabiaNum == true || $valGusanosNum == true){
+							}elseif($pEspecie == "Canina" && ($valSextupleNum == true || $valQuintupleNum == true || $valHidatidosisNum == true || $valRabiaNum == true || $valGusanosNum == true)){
 								echo "
 									<div class='alert alert-danger-alt alert-dismissable'>
 									<span class='glyphicon glyphicon-exclamation-sign'></span>
@@ -913,14 +755,53 @@ if (!empty($buscar_chip))
 								$valHidatidosisNum = false;
 								$valRabiaNum = false;
 								$valGusanosNum = false;
-							}elseif($valCastrado == true){
+
+							}elseif($pEspecie == "Felina" && ($valLeucemia == true || $valRabiaFelino == true || $valTriple == true)){
 								echo "
 									<div class='alert alert-danger-alt alert-dismissable'>
 									<span class='glyphicon glyphicon-exclamation-sign'></span>
 									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>Debe indicar si fue castrado.</div>
+									×</button>Debe completar la FECHA de aplicacion en las vacunas seleccionadas.</div>
 								";
-								$valCastrado = false;
+								$valLeucemia = false;
+								$valRabiaFelino = false;
+								$valTriple = false;
+
+							}elseif($pEspecie == "Felina" && ($valLeucemia == true || $valRabiaFelino == true || $valTriple == true)){
+								echo "
+									<div class='alert alert-danger-alt alert-dismissable'>
+									<span class='glyphicon glyphicon-exclamation-sign'></span>
+									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
+									×</button>Lla FECHA de aplicacion de las VACUNAS debe ser seleccionada con el calendario.</div>
+								";
+								$valLeucemia = false;
+								$valRabiaFelino = false;
+								$valTriple = false;
+
+							}elseif($pEspecie == "Equina" && ($valAnemia == true || $valInfluenza == true || $valAdenitis == true || $valEncefalomielitis == true)){
+								echo "
+									<div class='alert alert-danger-alt alert-dismissable'>
+									<span class='glyphicon glyphicon-exclamation-sign'></span>
+									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
+									×</button>Debe completar la FECHA de aplicacion en las vacunas seleccionadas.</div>
+								";
+								$valAnemia = false;
+								$valInfluenza = false;
+								$valAdenitis = false;
+								$valEncefalomielitis = false;
+
+							}elseif($pEspecie == "Equina" && ($valAnemia == true || $valInfluenza == true || $valAdenitis == true || $valEncefalomielitis == true)){
+								echo "
+									<div class='alert alert-danger-alt alert-dismissable'>
+									<span class='glyphicon glyphicon-exclamation-sign'></span>
+									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
+									×</button>Lla FECHA de aplicacion de las VACUNAS debe ser seleccionada con el calendario.</div>
+								";
+								$valAnemia = false;
+								$valInfluenza = false;
+								$valAdenitis = false;
+								$valEncefalomielitis = false;
+
 							}elseif($valFechaCastrado == true){
 								echo "
 									<div class='alert alert-danger-alt alert-dismissable'>
@@ -929,30 +810,6 @@ if (!empty($buscar_chip))
 									×</button>Debe indicar la fecha de castracion.</div>
 								";
 								$valFechaCastrado = false;
-							}elseif($valnroRecibo == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>Debe indicar el numero de recibo.</div>
-								";
-								$valnroRecibo = false;
-							}elseif($valnroReciboNum == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>El recibo debe ser un numero.</div>
-								";
-								$valnroReciboNum = false;
-							}elseif($valPropietario == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>Debe indicar un PROPIETARIO.</div>
-								";
-								$valPropietario = false;
 							}elseif($successAnimal == true){
 								echo "
 									<div class='alert alert-success-alt alert-dismissable'>
@@ -986,7 +843,7 @@ if (!empty($buscar_chip))
 
 							<form class="form form-signup" role="form">
 
-								<h4 class="text-center"><img src="../images/icons/animal.png" alt="Municipalidad Bariloche" align="center" style="margin:0px 0px 0px 0px" height="64" width="64"></h4>
+							  <h4 class="text-center"><img src="../images/icons/animal.png" alt="Municipalidad Bariloche" align="center" style="margin:0px 0px 0px 0px" height="64" width="64"></h4>
 								<h4 class="text-center bg-info">Animal</h4>
 
 								<div class="col-md-6 col-md-offset">
@@ -1003,7 +860,7 @@ if (!empty($buscar_chip))
 											<div class="input-group">
 												<span class="input-group-addon"><i class="fa fa-calendar-o fa-fw"></i> Fecha Chipeado* </span>
 												<div class='input-group date' id='divMiCalendario'>
-													<input name="txt_fecha_chip" type='text' id="txt_fecha_chip" class="form-control" value="<?php echo $fechaChip;?>"/>
+													<input name="txt_fecha_chip" type='text' id="txt_fecha_chip" class="form-control" value="<?php echo $fechaChip;?>" required/>
 													<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
 												</div>
 											</div>
@@ -1013,33 +870,19 @@ if (!empty($buscar_chip))
 											<div class="input-group">
 												<span class="input-group-addon"><i class="fa fa-question-circle-o fa-fw"></i> Plan Institución*</span>
 												<div class="col-xs-15 selectContainer">
-													<select class="form-control" name="select_plan">
-													  <option value="Barrial">Barrial</option>
+													<select class="form-control" name="select_plan" required>
 													  <option value="Municipal">Municipal</option>
-													  <option value="Campaña 2017">Campaña 2017</option>
 													  <option value="Veterinaria">Veterinaria</option>
-													  <option  selected="selected"><?php echo $pPlan;?></option>
+													  <option  selected="selected"><?php echo $plan;?></option>
 													</select>
 												</div>
 											</div>
 										</div>
 
-										<!-- ..........PARA QUE LO HAGA GUS..... -->
-										<div class="form-group">
-											<div class="input-group">
-												<span class="input-group-addon"><i class="fa fa-id-card-o fa-fw"></i> Foto Carnet</span>
-												<div class='input-group'>
-													<input name="txt_foto_carnet" type="text" class="form-control" id="txt_foto_carnet" value="<?php echo $urlFoto;?>"  placeholder="Seleccionar archivo"  />
-													<span class="btn btn-default btn-file"><i class="fa fa-camera fa-fw"></i><input type="file" hidden></span>
-												</div>
-											</div>
-										</div>
-										<!-- .............................. -->
-
 										<div class="form-group">
 											<div class="input-group">
 												<span class="input-group-addon"><i class="fa fa-calendar-check-o fa-fw"></i> Año Nacimiento</span>
-												<input name="txt_anio_animal" type="text" class="form-control" id="txt_anio_animal" value="<?php echo $anioNacimiento;?>"  />
+												<input name="txt_anio_animal" type="number" class="form-control" id="txt_anio_animal" value="<?php echo $anioNacimiento;?>"  required/>
 											</div>
 										</div>
 
@@ -1047,7 +890,9 @@ if (!empty($buscar_chip))
 											<div class="input-group">
 												<span class="input-group-addon"><i class="fa fa-bug fa-fw"></i> Especie*</span>
 												<div class="col-xs-15 selectContainer">
-													<select class="form-control" id="select_especie" name="select_especie" onchange="form.submit()">
+													<select class="form-control" id="select_especie" name="select_especie" onChange="form.submit()" required>
+													
+															<option  selected="selected"> <?php echo $especie;?> </option>
 														<?php
 															while ($row=mysql_fetch_array($especies))
 															{
@@ -1056,11 +901,11 @@ if (!empty($buscar_chip))
 																$especie = ($row['especie']);
 
 																?>
-															<option value = "<?php echo $especie; ?>" selected="selected"><?php echo $especie;?> </option>
+															<option value = "<?php echo $especie; ?>"><?php echo $especie;?> </option>
 														<?php
 														}
 														?>
-														<option  selected="selected"> <?php echo $pEspecie;?> </option>
+														
 													</select>
 												</div>
 											</div>
@@ -1070,7 +915,7 @@ if (!empty($buscar_chip))
 											<div class="input-group">
 												<span class="input-group-addon"><i class="fa fa-info-circle fa-fw"></i> Raza*</span>
 												<div class="col-xs-15 selectContainer">
-													<select class="form-control" id="select_raza" name="select_raza" onchange="21" >
+													<select class="form-control" id="select_raza" name="select_raza" onChange="21" required>
 														<?php
 															while ($row=mysql_fetch_array($razas))
 															{
@@ -1092,7 +937,7 @@ if (!empty($buscar_chip))
 											<div class="input-group">
 												<span class="input-group-addon"><i class="fa fa-info-circle fa-fw"></i> Pelaje </span>
 												<div class="col-xs-15 selectContainer">
-													<select class="form-control" name="select_pelaje">
+													<select class="form-control" name="select_pelaje" required>
 														<?php
 															while ($row=mysql_fetch_array($pelajes))
 															{
@@ -1111,31 +956,30 @@ if (!empty($buscar_chip))
 											</div>
 										</div>
 
-										<?php 
+										<?php
 											if($pEspecie == "Equina")
 											{ ?>
 
 												<div class="form-group">
 													<div class="input-group">
 														<span class="input-group-addon"><i class="fa fa-arrows-v fa-fw"></i> Alzada</span>
-														<input name="txt_alzada" type="text" class="form-control" id="txt_alzada" value="<?php echo $alzada;?>" disabled="disabled" />
+														<input name="txt_alzada" type="text" class="form-control" id="txt_alzada" value="<?php echo $alzada;?>"  required/>
 													</div>
 												</div>
-												
+
 												<div class="form-group">
 													<div class="input-group">
-														<span class="input-group-addon"><i class="fa fa-book fa-fw"></i> Libreta Sanitaria <input type="checkbox" name="libreta" value="Libreta" <?php if($libreta == true) echo "checked='checked'"; ?> disabled="disabled"/> </span>
+														<span class="input-group-addon"><i class="fa fa-book fa-fw"></i> Libreta Sanitaria <input type="checkbox" name="libreta" value="Libreta" <?php if(isset($_POST['libreta']) or $libreta =='Libreta') echo "checked='checked'"; ?>/> </span>
 													</div>
-												</div>  															
-												
+												</div>
+
 											<?php }else
 											{?>
 												<div class="form-group">
 													<div class="input-group">
 														<span class="input-group-addon"><i class="fa fa-info-circle fa-fw"></i> Tamaño*</span>
 														<div class="col-xs-15 selectContainer">
-															<select  class="form-control" name="select_tamanio">
-																<option value="Seleccione un caracter...">Seleccione un tamaño...</option>
+															<select  class="form-control" name="select_tamanio" required>
 																<option value="Extra Grande">Extra Grande</option>
 																<option value="Grande">Grande</option>
 																<option value="Mediano">Mediano</option>
@@ -1152,8 +996,7 @@ if (!empty($buscar_chip))
 											<div class="input-group">
 												<span class="input-group-addon"><i class="fa fa-venus-mars fa-fw"></i> Sexo*</span>
 												<div class="col-xs-15 selectContainer">
-													<select  class="form-control" name="select_sexo">
-														<option value="Seleccione un sexo...">Seleccione un sexo...</option>
+													<select  class="form-control" name="select_sexo" required>
 														<option value="Macho">Macho</option>
 														<option value="Hembra">Hembra</option>
 														<option  selected="selected"><?php echo $pSexo;?></option>
@@ -1166,8 +1009,7 @@ if (!empty($buscar_chip))
 											<div class="input-group">
 												<span class="input-group-addon"><i class="fa fa-certificate fa-fw"></i> Condición*</span>
 												<div class="col-xs-15 selectContainer">
-													<select class="form-control" name="select_condicion">
-														<option value="Seleccione una condición...">Seleccione una condición...</option>
+													<select class="form-control" name="select_condicion" required>
 														<option value="Adoptado Perrera">Adoptado Perrera</option>
 														<option value="Adoptado Asoc. Protectora">Adoptado Asoc. Protectora</option>
 														<option value="Propio">Propio</option>
@@ -1184,7 +1026,6 @@ if (!empty($buscar_chip))
 												<span class="input-group-addon"><i class="fa fa-info-circle fa-fw"></i> Carácter</span>
 												<div class="col-xs-15 selectContainer">
 													<select class="form-control" name="select_caracter">
-														<option value="Seleccione un caracter..">Seleccione un carácter...</option>
 														<option value="Sociable">Sociable</option>
 														<option value="Peligroso">Peligroso</option>
 														<option  selected="selected"><?php echo $pCaracter;?></option>
@@ -1193,12 +1034,7 @@ if (!empty($buscar_chip))
 											</div>
 										</div>
 
-										<div class="form-group">
-											<div class="input-group">
-												<span class="input-group-addon"><i class="fa fa-flag-o fa-fw"></i> Capturas</span>
-												<input name="txt_capturas" type="number" min="0" class="form-control" id="txt_capturas" value="<?php echo $capturas;?>" onkeypress="return tabular(event,this)" placeholder="Cantidad"/>
-											</div>
-										</div>
+
 
 									</div>
 								</div>
@@ -1208,11 +1044,18 @@ if (!empty($buscar_chip))
 
 										<div class="form-group">
 											<div class="input-group">
+												<span class="input-group-addon"><i class="fa fa-flag-o fa-fw"></i> Capturas</span>
+												<input name="txt_capturas" type="number" min="0" class="form-control" id="txt_capturas" value="<?php echo $capturas;?>" onKeyPress="return tabular(event,this)" placeholder="Cantidad" required/>
+											</div>
+										</div>
+
+										<div class="form-group">
+											<div class="input-group">
 
 												<span class="input-group-addon"><i class="fa fa-medkit fw" aria-hidden="true"></i> Vacunas y Desparacitado
 
-												<?php 
-											
+												<?php
+
 												switch ($pEspecie) {
 
 													case "Canina":
@@ -1286,59 +1129,62 @@ if (!empty($buscar_chip))
 
   													</div>
 
-  													<?php break; 
+  													<?php break;
 
 													case "Equina":
 													?>
 														<div class="form-group">
 															<div class="col-xs-5 col-md-offset-0">
 																<br><br>
-	  															<input type="checkbox" name="anemia" value="Anemia" <?php if($anemia == true) echo "checked='checked'"; ?> disabled="disabled" /> <label>Anemia Infecciosa </label>
+	  															<input type="checkbox" name="anemia" value="Anemia" <?php if(isset($_POST['anemia']) or $anemia=='Anemia Infecciosa') echo "checked='checked'"; ?> /> <label>Anemia Infecciosa </label>
 	  														</div>
 	  														<br>
-	  														<div class="form-group">
-																<div class="input-group">
-																	<span class="input-group-addon">Fecha </span>
-																	<input name="txt_fecha_anemia" type='text' id="txt_fecha_anemia" class="form-control" value="<?php if($anemia == true) echo $fechaAnemia;?>" disabled="disabled" />
+	  														<div class="input-group">
+																<span class="input-group-addon">Fecha* </span>
+																<div class='input-group date' id='divMiCalendarioAnemia'>
+																	<input name="txt_fecha_anemia" type='text' id="txt_fecha_anemia" class="form-control" value="<?php echo $fechaAnemia;?>"/>
+																	<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
 																</div>
 															</div>
 
 	  														<div class="col-xs-5 col-md-offset-0">
 																<br><br>
-	  															<input type="checkbox" name="influenza" value="Influenza" <?php if($influenza == true) echo "checked='checked'"; ?> disabled="disabled" /> <label>Influenza Equina </label>
+	  															<input type="checkbox" name="influenza" value="Influenza" <?php if(isset($_POST['influenza']) or $influenza=='Influenza Equina') echo "checked='checked'"; ?>/> <label>Influenza Equina </label>
 	  														</div>
 	  														<br>
-	  														<div class="form-group">
-																<div class="input-group">
-																	<span class="input-group-addon">Fecha </span>
-																	<input name="txt_fecha_influenza" type='text' id="txt_fecha_influenza" class="form-control" value="<?php if($influenza == true) echo $fechaInfluenza;?>" disabled="disabled" />
-																</div>
-															</div>
-
-															<div class="col-xs-5 col-md-offset-0">
-																<br><br>
-	  															<input type="checkbox" name="adenitis" value="Adenitis" <?php if($adenitis == true) echo "checked='checked'"; ?> disabled="disabled"/> <label>Adenitis Equina </label>
-	  														</div>
-	  														<br>
-	  														<div class="form-group">
-																<div class="input-group">
-																	<span class="input-group-addon">Fecha </span>
-																	<input name="txt_fecha_adenitis" type='text' id="txt_fecha_adenitis" class="form-control" value="<?php if($adenitis == true) echo $fechaAdenitis;?>" disabled="disabled" />
+	  														<div class="input-group">
+																<span class="input-group-addon">Fecha* </span>
+																<div class='input-group date' id='divMiCalendarioInfluenza'>
+																	<input name="txt_fecha_influenza" type='text' id="txt_fecha_influenza" class="form-control" value="<?php echo $fechaInfluenza;?>"/>
+																	<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
 																</div>
 															</div>
 
 	  														<div class="col-xs-5 col-md-offset-0">
 																<br><br>
-	  															<input type="checkbox" name="encefalomielitis" value="Encefalomielitis" <?php if($encefalomielitis == true) echo "checked='checked'"; ?> disabled="disabled" /> <label>Encefalomielitis </label>
+	  															<input type="checkbox" name="adenitis" value="Adenitis" <?php if(isset($_POST['adenitis']) or $adenitis=='Adenitis Equina') echo "checked='checked'"; ?> /> <label>Adenitis Equina </label>
 	  														</div>
 	  														<br>
-	  														<div class="form-group">
-																<div class="input-group">
-																	<span class="input-group-addon">Fecha </span>
-																	<input name="txt_fecha_encefalomielitis" type='text' id="txt_fecha_encefalomielitis" class="form-control" value="<?php if($encefalomielitis == true) echo $fechaEncefalomielitis;?>" disabled="disabled" />
+	  														<div class="input-group">
+																<span class="input-group-addon">Fecha* </span>
+																<div class='input-group date' id='divMiCalendarioAdenitis'>
+																	<input name="txt_fecha_adenitis" type='text' id="txt_fecha_adenitis" class="form-control" value="<?php echo $fechaAdenitis;?>"/>
+																	<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
 																</div>
 															</div>
 
+	  														<div class="col-xs-5 col-md-offset-0">
+																<br><br>
+	  															<input type="checkbox" name="encefalomielitis" value="Encefalomielitis" <?php if(isset($_POST['encefalomielitis']) or $encefalomielitis=='Encefalomielitis') echo "checked='checked'"; ?> /> <label>Encefalomielitis </label>
+	  														</div>
+	  														<br>
+	  														<div class="input-group">
+																<span class="input-group-addon">Fecha* </span>
+																<div class='input-group date' id='divMiCalendarioEncefalomielitis'>
+																	<input name="txt_fecha_encefalomielitis" type='text' id="txt_fecha_encefalomielitis" class="form-control" value="<?php echo $fechaEncefalomielitis;?>"/>
+																	<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
+																</div>
+															</div>
 														</div>
 													<?php break;
 
@@ -1347,46 +1193,46 @@ if (!empty($buscar_chip))
 														<div class="form-group">
 															<div class="col-xs-5 col-md-offset-0">
 																<br><br>
-	  															<input type="checkbox" name="leucemia" value="Leucemia" <?php if($leucemia == true) echo "checked='checked'"; ?> disabled="disabled" /> <label>Leucemia </label>
+	  															<input type="checkbox" name="leucemia" value="Leucemia" <?php if(isset($_POST['leucemia']) or $leucemia=='Leucemia') echo "checked='checked'"; ?> /> <label>Leucemia </label>
 	  														</div>
 	  														<br>
-	  														<div class="form-group">
-																<div class="input-group">
-																	<span class="input-group-addon">Fecha </span>
-																	<input name="txt_fecha_leucemia" type='text' id="txt_fecha_leucemia" class="form-control" value="<?php if($leucemia == true) echo $fechaLeucemia;?>" disabled="disabled" />
+	  														<div class="input-group">
+																<span class="input-group-addon">Fecha* </span>
+																<div class='input-group date' id='divMiCalendarioLeucemia'>
+																	<input name="txt_fecha_leucemia" type='text' id="txt_fecha_leucemia" class="form-control" value="<?php echo $fechaLeucemia;?>"/>
+																	<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
 																</div>
 															</div>
 
 	  														<div class="col-xs-5 col-md-offset-0">
 																<br><br>
-	  															<input type="checkbox" name="rabiaFelino" value="RabiaFelino" <?php if($rabiaFelino == true) echo "checked='checked'"; ?> disabled="disabled" /> <label>Rabia </label>
+	  															<input type="checkbox" name="rabiaFelino" value="RabiaFelino" <?php if(isset($_POST['rabiaFelino']) or $rabiaFelino=='Rabia') echo "checked='checked'"; ?>/> <label>Rabia </label>
 	  														</div>
 	  														<br>
-	  														<div class="form-group">
-																<div class="input-group">
-																	<span class="input-group-addon">Fecha </span>
-																	<input name="txt_fecha_rabia_felino" type='text' id="txt_fecha_rabia_felino" class="form-control" value="<?php if($rabiaFelino == true) echo $fechaRabiaFelino;?>" disabled="disabled" />
+	  														<div class="input-group">
+																<span class="input-group-addon">Fecha* </span>
+																<div class='input-group date' id='divMiCalendarioRabiaFelino'>
+																	<input name="txt_fecha_rabia_felino" type='text' id="txt_fecha_rabia_felino" class="form-control" value="<?php echo $fechaRabiaFelino;?>"/>
+																	<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
 																</div>
 															</div>
 
 															<div class="col-xs-5 col-md-offset-0">
 																<br><br>
-	  															<input type="checkbox" name="triple" value="Triple" <?php if($triple == true) echo "checked='checked'"; ?> disabled="disabled"/> <label>Triple </label>
+	  															<input type="checkbox" name="triple" value="Triple" <?php if(isset($_POST['triple']) or $triple=='Triple') echo "checked='checked'"; ?>/> <label>Triple </label>
 	  														</div>
 	  														<br>
-	  														<div class="form-group">
-																<div class="input-group">
-																	<span class="input-group-addon">Fecha </span>
-																	<input name="txt_fecha_triple" type='text' id="txt_fecha_triple" class="form-control" value="<?php if($triple == true) echo $fechaTriple;?>" disabled="disabled" />
+	  														<div class="input-group">
+																<span class="input-group-addon">Fecha* </span>
+																<div class='input-group date' id='divMiCalendarioTriple'>
+																	<input name="txt_fecha_triple" type='text' id="txt_fecha_triple" class="form-control" value="<?php echo $fechaTriple;?>"/>
+																	<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
 																</div>
 															</div>
-
 														</div>
 
 													<?php break;
 													} ?>
-
-
 
 												</span>
 											</div>
@@ -1397,7 +1243,7 @@ if (!empty($buscar_chip))
 												<span class="input-group-addon"><i class="fa fa-user-md fa-fw"></i> Castrado <br><br>
 												<div class="col-xs-4 col-md-offset-0">
 													<div class="form-group">
-														<select class="form-control" name="select_castrado">
+														<select class="form-control" name="select_castrado" required>
 															<option value="No">No</option>
 													  		<option value="Si">Si</option>
 														 	<option  selected="selected"><?php echo $pCastrado;?></option>
@@ -1425,7 +1271,7 @@ if (!empty($buscar_chip))
 										<div class="form-group">
 											<div class="input-group">
 												<span class="input-group-addon"><i class="fa fa-ticket fa-fw"></i> Nro. Recibo*</span>
-												<input name="txt_nro_recibo" type="text" class="form-control" id="txt_nro_recibo" value="<?php echo $nroRecibo;?>"  />
+												<input name="txt_nro_recibo" type="text" class="form-control" id="txt_nro_recibo" value="<?php echo $nroRecibo;?>"  required />
 											</div>
 										</div>
 									</div>
@@ -1440,40 +1286,42 @@ if (!empty($buscar_chip))
 												<div class="col-md-6 col-md-offset">
 													<div class="panel panel-default">
 
-														<div class="panel-body">
-															<div class="form-group">
-																<div class="input-group">
-																	<span class="input-group-addon"><i class="fa fa-user fa-fw"></i> Propietario </span>
-																	<div class="col-xs-15 selectContainer">
-																		<select id="combobox" class="form_control" name="select_propietarios">
-																			<?php
-																				while ($row=mysql_fetch_array($propietarios))
-																				{
-																					$id_persona = ($row['id_persona']);
-																					$documento = ($row['documento']);
-																					$nombre = ($row['nombre']);
-																					$apellido = ($row['apellido']);
+														<div class="form-group">
+															<div class="input-group">
+																<span class="input-group-addon"><i class="fa fa-ticket fa-fw"></i> Propietario</span>
+																<input name="txt_propMostrar" type="text" class="form-control" id="" value="<?php echo $propMostrar;?>" onkeypress="return tabular(event,this)" readonly/>
+															</div>
+														</div>
 
-																				?>
-																				<option value = "<?php echo $id_persona;?>"><?php echo  utf8_encode($documento." ".$nombre." ".$apellido);?> </option>
-																			<?php
-																				}
-																			?>
 
-																			<option value = "<?php echo $propietarioPrincipal;?>" selected="selected"><?php echo $propMostrar; ?></option>
-
-																		</select>
-																	</div>
-																</div>
+														<div class="form-group" >
+															<div class="input-group">
+																<input name="txt_id_propietario" type="text" class="form-control" id="txt_id_propietario" value="<?php echo $id_persona;?>" onkeypress="return tabular(event,this)"/>
 															</div>
 														</div>
 
 														<div class="panel-body">
 															<div class="form-group">
 																<div class="input-group">
-																	<span class="input-group-addon"><i class="fa fa-user fa-fw"></i> Chip aplicado por: </span>
+																	<span class="input-group-addon"><i class="fa fa-user fa-fw"></i> Chipeado / Patentado por: </span>
+																	<div class="col-xs-15 selectContainer">
+																		<select class="form-control" id="select_chipeadores" name="select_chipeadores" required>
+																			<?php
+																				while ($row=mysql_fetch_array($chipeadores))
+																				{
+																					$id_chipeador = ($row['id_chipeador']);
 
-																	<input name="buscar_propietario" type="text" class="form-control" id="buscar_propietario"  value="<?php echo $chipeador; ?>" disabled="disabled"/>
+																					$nombre_chipeador = ($row['nombre_chipeador']);
+
+																					?>
+																				<option value = "<?php echo $nombre_chipeador; ?>" selected="selected"><?php echo $nombre_chipeador;?> </option>
+																			<?php
+																			}
+																			?>
+																			<option  selected="selected"> <?php echo $pNombre_chipeador;?> </option>
+																		</select>
+																	</div>
+
 																</div>
 															</div>
 														</div>
@@ -1482,20 +1330,66 @@ if (!empty($buscar_chip))
 													</div>
 												</div>
 
+
 												<div class="col-md-6 col-md-offset">
+												<span class="input-group-addon">Imágenes Animal</span>
+													<div class="panel panel-default">
+														<div class="panel-body">
+                                                                <table>
+                                                                  <thead>
+																	<th>Nombre</th>
+                                                                    <th>Imagen</th>
+                                                                    <th>Eliminar&nbsp;</th>
+                                                                  </thead>
+                                                                  <?php
+																	$link=conectarse_mysql_veterinaria();
+																 	$sql_images="select id,archivo from ejemplares_fotos where id_ejemplar=$id_ejemplar";
+															   		$result_images=mysql_query($sql_images,$link);
+
+															  		$cont=0;
+
+																	while($row=mysql_fetch_array($result_images)){
+																  ?>
+                                                                  <tr>
+                                                                    <td width="200" align="left" valign="middle" ><?php echo $row['archivo']; ?></td>
+                                                                    <td class="<?php echo $clase;?>"><img  border="0" class='mano' src='imagenes_ejemplares/<?php echo $row["archivo"];?>' width="200" /></td>
+                                                                    <td><a href="foto_delete.php?id_file=<?php echo $row['id']; ?>&txt_buscar_chip=<?php echo $_GET['txt_buscar_chip'];?>"><img src='../images/eliminar.gif' alt="" border="0" class='' hspace="25"/></a></td>
+                                                                  </tr>
+                                                                  <?php
+																   }
+																  ?>
+                                                                </table>
+
+
+													  </div>
+
+															<div class="form-group">
+															<h5 class="text-center bg-info"><i class="fa fa-exclamation-circle fw" aria-hidden="true"></i> Luego de seleccionar la imagen, haga clic en "Guardar Cambios"</h5>
+																<div class="input-group">
+																	<div class='input-group'>
+																		<span class="btn btn-default btn-file"><i class="fa fa-paperclip fa-fw"></i><input name="foto_ejemplar" type="file" hidden>Seleccione una imagen...</span>
+																	</div>
+																</div>
+															</div>
+														</div>
+
+													</div>
+													<div class="col-md-6 col-md-offset">
 													<div class="panel panel-default">
 														<div class="panel-body">
 
 															<div class="form-group">
 																<div class="input-group">
 																	<span class="input-group-addon"><i class="fa fa-microchip fa-fw"></i> Nro. CHIP*</span>
-																	<input name="txt_nro_chip" type="text" class="form-control" id="txt_nro_chip" value="<?php echo $nroChip;?>"  disabled="disabled"  />
+																	<input name="txt_nro_chip" type="text" class="form-control" id="txt_nro_chip" value="<?php echo $nroChip;?>"  readonly  />
+																	<input name="txt_id_ejemplar" type="text" class="form-control" id="txt_id_ejemplar" value="<?php echo $id_ejemplar;?>" />
 																</div>
 															</div>
 
-															<input name="Submit" type="submit" method="post" class="btn btn-sm btn-primary btn-block btn-danger" value="GUARDAR CAMBIOS" />
+															<input name="guardar_ejemplar" type="submit" method="post"  class="btn btn-sm btn-primary btn-block btn-danger" value="GUARDAR CAMBIOS" />
 														</div>
 													</div>
+												</div>
 												</div>
 
 											</div>
@@ -1503,7 +1397,7 @@ if (!empty($buscar_chip))
 									</div>
 								</div><!-- cierra row -->
 							</form>
-						</div>
+		  </div>
 					</div>	<!-- Container -->
 				</form>
 			</div>
@@ -1523,6 +1417,7 @@ if (!empty($buscar_chip))
       format: 'DD-MM-YYYY'
     });
 
+	//Canino
 	 $('#divMiCalendarioSextuple').datetimepicker({
       format: 'DD-MM-YYYY'
     });
@@ -1540,6 +1435,31 @@ if (!empty($buscar_chip))
     });
 
 	 $('#divMiCalendarioGusanos').datetimepicker({
+      format: 'DD-MM-YYYY'
+    });
+
+	 //Equinos
+	 $('#divMiCalendarioAnemia').datetimepicker({
+      format: 'DD-MM-YYYY'
+    });
+	 $('#divMiCalendarioInfluenza').datetimepicker({
+      format: 'DD-MM-YYYY'
+    });
+	 $('#divMiCalendarioAdenitis').datetimepicker({
+      format: 'DD-MM-YYYY'
+    });
+	 $('#divMiCalendarioEncefalomielitis').datetimepicker({
+      format: 'DD-MM-YYYY'
+    });
+
+	//Felinos
+	$('#divMiCalendarioLeucemia').datetimepicker({
+      format: 'DD-MM-YYYY'
+    });
+	 $('#divMiCalendarioRabiaFelino').datetimepicker({
+      format: 'DD-MM-YYYY'
+    });
+	 $('#divMiCalendarioTriple').datetimepicker({
       format: 'DD-MM-YYYY'
     });
     </script>

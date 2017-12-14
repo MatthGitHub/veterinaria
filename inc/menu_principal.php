@@ -51,8 +51,8 @@ if ($_SESSION['permiso'] != 'autorizado' ){
 				<div class="col-lg-5">
 					<?php if(($_SESSION['rol'] > 0)&&($_SESSION['rol'] < 4)){?>
 					<p>
-				    <a class="btn btn-lg btn-direct" href="../mod_animales/frm_alta_animal.php" role="button">Cargar Animal</a>
-						<a class="btn btn-lg btn-direct" href="../mod_personas/frm_alta_propietario.php" role="button">Cargar Persona</a>
+				    <a class="btn btn-lg btn-direct" href="../mod_personas/personas.php" role="button">Cargar Animal</a>
+
 					</p>
 					<?php } ?>
 				</div>
