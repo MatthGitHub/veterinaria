@@ -18,7 +18,7 @@ $link_mysql=conectarse_mysql_veterinaria();
 $barrio=$_POST['barrio'];
 
 //DATOS
-$sql="SELECT numero_chip,e.nombre,sexo,caracter, tamanio, condicion,especie, raza, pelaje,p.nombre AS Propietario, p.apellido,p.documento,p.calle,p.numero,p.telefono, p.piso,p.departamento
+$sql="SELECT numero_chip,e.nombre,e.sexo,caracter, tamanio, condicion,especie, raza, pelaje,p.nombre AS Propietario, p.apellido,p.documento,p.calle_nocod,p.numeracion_calle,p.telefono, p.piso,p.departamento
       FROM ejemplares e
       JOIN ejemplares_personas ep ON e.id_ejemplar = ep.fk_id_ejemplar
       JOIN personas p ON p.id_persona = ep.fk_id_persona
@@ -34,35 +34,36 @@ $pdf->ezImage("img.jpg", 0, 60, 'none', 'left');
 $titles = 'Animales por barrio: '.$barrio;
 
 $i= 0;
-$pdf->ezText('<b>Municipalidad de San Carlos de Bariloche</b>',14,array('justification'=>'center'));
+$pdf->ezText('<b>Sistema Veterinaria y Zoonosis - MSCB</b>',14,array('justification'=>'center'));
 $pdf->ezText("\n", 5);
 $pdf->ezText("_______________________________________________________________________________________", 10);
-$pdf->ezText("_______________________________________________________________________________________", 10);
-$pdf->ezText("\n", 10);
+$pdf->ezText("\n", 5);
 $pdf->ezText($titles,14);
 while($mascota = mysql_fetch_array($animales)){
   $i++;
   $pdf->ezText("_______________________________________ $i _____________________________________________", 10);
-  $pdf->ezText("Datos propietario ________________________________", 13);
   $pdf->ezText("\n", 5);
-  $pdf->ezText('Nombre y Apellido:  '.$mascota['Propietario'].' '.$mascota['apellido'],12);
-  $pdf->ezText('Documento:  '.$mascota['documento'],12);
-  $pdf->ezText('Telefono'.$mascota['telefono'],12);
-  $pdf->ezText('Calle:  '.$mascota['calle'],12);
-  $pdf->ezText('Numero:  '.$mascota['numero'],12);
-  $pdf->ezText('Piso:  '.$mascota['piso'],12);
+  $pdf->ezText("__________________ Datos propietario __________________", 12);
   $pdf->ezText("\n", 5);
-  $pdf->ezText("Datos ejemplar ____________________________________", 13);
+  $pdf->ezText('Nombre y Apellido:  '.$mascota['Propietario'].' '.$mascota['apellido'],10);
+  $pdf->ezText('Documento:  '.$mascota['documento'],10);
+  $pdf->ezText(utf8_decode('Teléfono'.$mascota['telefono']),10);
+  $pdf->ezText('Calle:  '.$mascota['calle'],10);
+  $pdf->ezText(utf8_decode('Número:  '.$mascota['numero']),10);
+  $pdf->ezText('Piso:  '.$mascota['piso'],10);
   $pdf->ezText("\n", 5);
-  $pdf->ezText('Numero Chip:  '.$mascota['numero_chip'],12);
-  $pdf->ezText('Nombre:    '.$mascota['nombre'],12);
-  $pdf->ezText('Sexo:       '.$mascota['sexo'],12);
-  $pdf->ezText('Caracter: '.$mascota['caracter'],12);
-  $pdf->ezText('Tamanio: '.$mascota['tamanio'],12);
-  $pdf->ezText('Condicion: '.$mascota['condicion'],12);
-  $pdf->ezText('Especie: '.$mascota['especie'],12);
-  $pdf->ezText('Raza: '.$mascota['raza'],12);
-  $pdf->ezText('Pelaje: '.$mascota['pelaje'],12);
+  $pdf->ezText("__________________ Datos animal __________________", 12);
+  $pdf->ezText("\n", 5);
+  $pdf->ezText(utf8_decode('Número Patentamiento / Chip:  '.$mascota['numero_chip']),10);
+  $pdf->ezText('Nombre:    '.$mascota['nombre'],10);
+  $pdf->ezText('Especie: '.$mascota['especie'],10);
+  $pdf->ezText('Raza: '.$mascota['raza'],10);
+  $pdf->ezText('Pelaje: '.$mascota['pelaje'],10);
+  $pdf->ezText(utf8_decode('Tamaño: '.$mascota['tamanio']),10);
+  $pdf->ezText('Sexo:       '.$mascota['sexo'],10);
+  $pdf->ezText(utf8_decode('Carácter: '.$mascota['caracter']),10);
+  $pdf->ezText(utf8_decode('Condición: '.$mascota['condicion']),10);
+
 }
 
 $pdf->ezText("\n", 10);

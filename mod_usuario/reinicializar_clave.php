@@ -1,5 +1,5 @@
 <?php
-include("../lib/sesion.php");
+include("../inc/sesion.php");
 include("../mod_sql/sql.php");
 include("../lib/funciones.php");
 if ($_SESSION['permiso'] != 'autorizado' ){

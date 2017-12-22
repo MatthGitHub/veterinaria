@@ -18,7 +18,7 @@ include("../mod_sql/sql.php");
 
 
 //Capturo dni encontrado
-$buscar_chip = $_GET['txt_buscar_chip'];
+$buscar_chip = $_POST['txt_buscar_chip'];
 
 //Inicializo variables
 $id_ejemplar = "";
@@ -42,6 +42,8 @@ $fechaVacuna = "";
 $observaciones = "";
 $nroRecibo = "";
 $plan = "";
+$desparacitado=false;
+$fechaDesparacitado="";
 $sextuple=false;
 $fechaSextuple="";
 $quintuple=false;
@@ -133,7 +135,7 @@ if (!empty($buscar_chip))
 
 					$rowAplicador=mysql_fetch_array($personaAp);
 
-					$chipeador = $rowAplicador['DOCUMENTO'].' '.$rowAplicador['NOMBRE'].' '.$rowAplicador['APELLIDO'];
+					
 				}
 			}
 
@@ -156,6 +158,11 @@ if (!empty($buscar_chip))
 			{
 				while ($rowVac=mysql_fetch_array($vacunas))
 				{
+					if($rowVac['nombre_vacuna'] == "Desparacitado")
+					{
+						$desparacitado = $rowVac['nombre_vacuna'];
+						$fechaDesparacitado = fecha_normal_mysql($rowVac['fecha_aplicacion']);
+					}
 					if($rowVac['nombre_vacuna'] == "Sextuple")
 					{
 						$sextuple = true;
@@ -242,6 +249,16 @@ if (!empty($buscar_chip))
 					$propietarioPrincipal=$rowProp['documento']." ".$rowProp['nombre']." ".$rowProp['apellido'];
 				}
 			}
+
+			$persona_chip = sql_buscar_chipeador_ejemplar($id_ejemplar);
+
+			if ($persona_chip)
+			{
+				while ($row=mysql_fetch_array($persona_chip))
+				{
+					$nombre_chipeador = $row['nombre_chipeador'];
+				}
+			}
 		}
 	}
 		else
@@ -325,14 +342,14 @@ function set_focus()
 
 										<div class="form-group">
 											<div class="input-group">
-												<span class="input-group-addon"><i class="fa fa-calendar-o fa-fw"></i> Fecha Chipeado</span>
+												<span class="input-group-addon"><i class="fa fa-calendar-o fa-fw"></i> Fecha Chipeado / Patentado </span>
 												<input name="txt_fecha_chip" type="text" class="form-control" id="txt_fecha_chip" value="<?php echo $fechaChip;?>" disabled="disabled" />
 											</div>
 										</div>
 
 										<div class="form-group">
 											<div class="input-group">
-												<span class="input-group-addon"><i class="fa fa-question-circle-o fa-fw"></i> Plan Institución</span>
+												<span class="input-group-addon"><i class="fa fa-question-circle-o fa-fw"></i> Institución</span>
 												<input name="txt_plan" type="text" class="form-control" id="txt_plan" value="<?php echo $plan;?>" disabled="disabled" />
 											</div>
 										</div>
@@ -414,6 +431,34 @@ function set_focus()
 												<input name="txt_caracter" type="text" class="form-control" id="txt_caracter" value="<?php echo $caracter;?>" disabled="disabled" />
 											</div>
 										</div>
+										<div class="form-group">
+											<div class="input-group">
+												<span class="input-group-addon"><i class="fa fa-user-md fa-fw"></i> Castrado <br><br>
+
+													<div class="col-xs-5 col-md-offset-0">
+														<div class="form-group">
+															<div class="input-group">
+																<span class="input-group-addon">¿Castrado?</span>
+																<input name="txt_castrado" type="text" class="form-control" id="txt_castrado" value="<?php echo $castrado;?>" disabled="disabled" />
+															</div>
+														</div>
+													</div>
+
+													<div class="input-group">
+														<span class="input-group-addon">Fecha </span>
+														<input name="txt_fecha_castrado" type='text' id="txt_fecha_castrado" class="form-control" value="<?php echo $fechaCastrado;?>" disabled="disabled" />
+													</div>
+													<br>
+												</span>
+											</div>
+										</div>
+
+										<div class="form-group">
+											<div class="input-group">
+												<span class="input-group-addon"><i class="fa fa-ticket fa-fw"></i> Nro. Recibo*</span>
+												<input name="txt_nro_recibo" type="text" class="form-control" id="txt_nro_recibo" value="<?php echo $nroRecibo;?>" disabled="disabled" />
+											</div>
+										</div>
 									</div>
 								</div>
 
@@ -430,8 +475,22 @@ function set_focus()
 										<div class="form-group">
 											<div class="input-group">
 
-												<span class="input-group-addon"><i class="fa fa-medkit fw" aria-hidden="true"></i> Vacunas y Desparacitado
+												<span class="input-group-addon"><i class="fa fa-medkit fw" aria-hidden="true"></i> Desparacitado y Vacunas 
 
+												<div class="form-group">
+
+													<div class="col-xs-5 col-md-offset-0">
+														<br><br>
+														<input type="checkbox" name="desparacitado" value="Desparacitado" <?php if($desparacitado == true) echo "checked='checked'"; ?> disabled="disabled" /> <label>Desparacitado</label>
+													</div>
+													<br>
+													<div class="form-group">
+														<div class="input-group">
+															<span class="input-group-addon"> Fecha</span>
+															<input name="txt_fecha_desparacitado" type="text" class="form-control" id="txt_fecha_desparacitado" value="<?php if($desparacitado == true) echo $fechaDesparacitado;?>" disabled="disabled" />
+														</div>
+													</div>
+												</div>
 												<?php
 													switch ($especie) {
 														case "Canina":
@@ -602,38 +661,10 @@ function set_focus()
 										</div>
 
 										<div class="form-group">
-											<div class="input-group">
-												<span class="input-group-addon"><i class="fa fa-user-md fa-fw"></i> Castrado <br><br>
-
-													<div class="col-xs-5 col-md-offset-0">
-														<div class="form-group">
-															<div class="input-group">
-																<span class="input-group-addon">¿Castrado?</span>
-																<input name="txt_castrado" type="text" class="form-control" id="txt_castrado" value="<?php echo $castrado;?>" disabled="disabled" />
-															</div>
-														</div>
-													</div>
-
-													<div class="input-group">
-														<span class="input-group-addon">Fecha </span>
-														<input name="txt_fecha_castrado" type='text' id="txt_fecha_castrado" class="form-control" value="<?php echo $fechaCastrado;?>" disabled="disabled" />
-													</div>
-													<br>
-												</span>
-											</div>
-										</div>
-
-										<div class="form-group">
 										   <span class="input-group-addon"><i class="fa fa-commenting-o fw" aria-hidden="true"></i> Observaciones</span>
 										   <textarea class="form-control" rows="3" id="txt_observacion" name="txt_observacion" disabled="disabled" ><?php echo $observaciones; ?></textarea>
 										</div>
 
-										<div class="form-group">
-											<div class="input-group">
-												<span class="input-group-addon"><i class="fa fa-ticket fa-fw"></i> Nro. Recibo*</span>
-												<input name="txt_nro_recibo" type="text" class="form-control" id="txt_nro_recibo" value="<?php echo $nroRecibo;?>" disabled="disabled" />
-											</div>
-										</div>
 									</div>
 								</div>
 
@@ -654,13 +685,18 @@ function set_focus()
 																</div>
 															</div>
 
-															<div class="panel-body">
-																<div class="form-group">
-																	<div class="input-group">
-																		<span class="input-group-addon"><i class="fa fa-user fa-fw"></i> Chip aplicado por: </span>
+															<div class="form-group">
+																<div class="input-group">
+																	<span class="input-group-addon"><i class="fa fa-user fa-fw"></i> Chipeado / Patentado por: </span>
 
-																		<input name="txt_chipeador" type="text" class="form-control" id="txt_chipeador"  value="<?php echo $chipeador; ?>" disabled="disabled"/>
-																	</div>
+																	<input name="txt_chipeador" type="text" class="form-control" id="txt_chipeador"  value="<?php echo $nombre_chipeador; ?>" disabled="disabled"/>
+																</div>
+															</div>
+
+															<div class="form-group">
+																<div class="input-group">
+																	<span class="input-group-addon"><i class="fa fa-microchip fa-fw"></i> Nro. CHIP / Patente*</span>
+																	<input name="txt_nro_chip" type="text" class="form-control" id="txt_nro_chip" value="<?php echo $nroChip;?>"  disabled="disabled" />
 																</div>
 															</div>
 
@@ -707,26 +743,11 @@ function set_focus()
 																	</div>
 																</div>
 															</div>
+															
                             							</div>
+                            							<input name="Submit" type="submit" method="post" class="btn btn-sm btn-primary btn-block" value="CERRAR" />
 													</div>
 												</div>
-
-												<div class="col-md-6 col-md-offset">
-													<div class="panel panel-default">
-														<div class="panel-body">
-
-															<div class="form-group">
-																<div class="input-group">
-																	<span class="input-group-addon"><i class="fa fa-microchip fa-fw"></i> Nro. CHIP*</span>
-																	<input name="txt_nro_chip" type="text" class="form-control" id="txt_nro_chip" value="<?php echo $nroChip;?>"  disabled="disabled" />
-																</div>
-															</div>
-
-															<input name="Submit" type="submit" method="post" class="btn btn-sm btn-primary btn-block" value="CERRAR" />
-														</div>
-													</div>
-												</div>
-
 											</div>
 										</div>
 									</div>

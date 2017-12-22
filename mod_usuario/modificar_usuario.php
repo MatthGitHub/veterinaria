@@ -1,6 +1,6 @@
 <?php
 //--------------------------------Inicio de sesion------------------------
-include("../lib/sesion.php");
+include("../inc/sesion.php");
 include("../mod_sql/sql.php");
 include("../lib/funciones.php");
 
@@ -223,14 +223,15 @@ $stmt = mysql_query($sql,$link);
 						echo "";
 						}
 						?>
-						<h4 class="text-center"><img src="../images/icons/veterinario.png" alt="Municipalidad Bariloche" align="center" style="margin:0px 0px 0px 0px" height="64" width="64"></h4>
+						
 						<input style="visibility:hidden" name="usuario" type="text" class="form-control" id="usuario" value="<?php echo $usuario;?>"/>
 						<input style="visibility:hidden" name="clave" type="text" class="form-control" id="clave" value="<?php echo $nuevaClave;?>"/>
+						<h4 class="text-center"><img src="../images/icons/reset.png" alt="Municipalidad Bariloche" align="center" style="margin:0px 0px 0px 0px" height="64" width="64"></h4>
 						<input type="submit" name="Submit" value="REINICIALIZAR CLAVE"  class="btn btn-sm btn-primary btn-block">
 
 					</form>
 				</div>
-				
+
 			</div>
 		</div>
 

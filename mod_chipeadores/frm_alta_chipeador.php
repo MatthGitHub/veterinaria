@@ -176,7 +176,7 @@ function test_input($data) {
 							<div class="panel panel-default">
 								<div class="panel-body">
 									<form class="form form-signup" role="form">
-										<h4 class="text-center"><img src="../images/icons/propietario.png" alt="Municipalidad Bariloche" align="center" style="margin:0px 0px 0px 0px" height="64" width="64"></h4>
+										<h4 class="text-center"><img src="../images/icons/chipeadores.png" alt="Municipalidad Bariloche" align="center" style="margin:0px 0px 0px 0px" height="64" width="64"></h4>
 
 											<div class="form-group">
 												<div class="input-group">

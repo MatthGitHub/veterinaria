@@ -57,30 +57,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	$valor = explode('.',$_POST['select_ec']);
 	$txt_ec = $valor[0];
 
-	if ($txt_nombre_propietario == "")
-	{
-		$valNombre = true;
-	}elseif ($txt_apellido == "")
-	{
-		$valApellido = true;
-	}elseif($txt_dni == "")
-	{
-		$valDni = true;
-	}elseif(!is_numeric($txt_dni))
-	{
-		$valdniNum = true;
-	}elseif($txt_calle == "")
-	{
-		$valCalle = true;
-	}elseif ($txt_nro == "")
-	{
-		$valNro = true;
-	}elseif($txt_telefono == "")
-	{
-		$valTelefono = true;
-	}else{
-		$validado = true;
-	}
 }
 
 function test_input($data) {
@@ -92,38 +68,36 @@ function test_input($data) {
 
 //---------Persistir datos
 
-if($validado == true)
+//Controlo que no exista la persona
+if (!sql_buscar_persona_duplicada($txt_dni))
 {
-	//Controlo que no exista la persona
-	if (!sql_buscar_persona_duplicada($txt_dni))
+	$persona = sql_insert_persona($txt_nombre_propietario,$txt_apellido,$txt_dni,$txt_telefono,$txt_calle,$txt_sexo,$txt_nro,$txt_barrio,$txt_piso, $txt_dpto, $txt_email,$txt_ec,$txt_fecha_nac,$txt_pais,$txt_cp);
+
+	if ($persona)
 	{
-		$persona = sql_insert_persona($txt_nombre_propietario,$txt_apellido,$txt_dni,$txt_telefono,$txt_calle,$txt_sexo,$txt_nro,$txt_barrio,$txt_piso, $txt_dpto, $txt_email,$txt_ec,$txt_fecha_nac,$txt_pais,$txt_cp);
+		$success=true;
 
-		if ($persona)
-		{
-			$success=true;
-
-			$txt_nombre_propietario = "";
-			$txt_apellido = "";
-			$txt_dni = "";
-			$txt_telefono = "";
-			$txt_calle = "";
-			$txt_nro = "";
-			$txt_barrio = "";
-			$txt_piso = "";
-			$txt_dpto = "";
-			$txt_email = "";
-		}
-		else if (!$flag)
-		{
-			$errordb=true;
-		}
+		$txt_nombre_propietario = "";
+		$txt_apellido = "";
+		$txt_dni = "";
+		$txt_telefono = "";
+		$txt_calle = "";
+		$txt_nro = "";
+		$txt_barrio = "";
+		$txt_piso = "";
+		$txt_dpto = "";
+		$txt_email = "";
 	}
-	else
+	else if (!$flag)
 	{
-		 $errorDni=true;
+		$errordb=true;
 	}
 }
+else
+{
+	 $errorDni=true;
+}
+
 
 ?>
 
@@ -178,68 +152,7 @@ if($validado == true)
 					<div class="row">
 						<div class="col-md-4 col-md-offset-4">
 							<?php
-							if($valNombre == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>El NOMBRE no puede estar vacio.</div>
-								";
-								$valNombre = false;
-							}
-							elseif($valApellido == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>El APELLIDO de la persona no puede estar vacio</div>
-								";
-								$valApellido = false;
-							}
-							elseif($valDni == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>El DNI de la persona no puede estar vacio</div>
-								";
-								$valDni = false;
-							}
-							elseif($valdniNum == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>El DNI debe ser numerico.</div>
-								";
-								$valdniNum = false;
-							}
-							elseif($valCalle == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>El DOMICILIO de la persona no puede estar vacio</div>
-								";
-								$valCalle = false;
-							}elseif($valNro == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>El NUMERO DE DOMICILIO de la persona no puede estar vacio</div>
-								";
-								$valNro = false;
-							}
-							elseif($valTelefono == true){
-								echo "
-									<div class='alert alert-danger-alt alert-dismissable'>
-									<span class='glyphicon glyphicon-exclamation-sign'></span>
-									<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
-									×</button>El TELEFONO de la persona no puede estar vacio</div>
-								";
-								$valTelefono = false;
-							}elseif($success == true){
+							if($success == true){
 								echo "
 									<div class='alert alert-success-alt alert-dismissable'>
 									<span class='glyphicon glyphicon-ok'></span>
@@ -274,39 +187,39 @@ if($validado == true)
 											<div class="form-group">
 												<div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-keyboard-o fa-fw"></i> Nombre*</span>
-													<input name="txt_nombre_propietario" type="text" class="form-control" id="txt_nombre_propietario" value="<?php echo $txt_nombre_propietario;?>"/>
+													<input name="txt_nombre_propietario" type="text" class="form-control" id="txt_nombre_propietario" value="<?php echo $txt_nombre_propietario;?>" required/>
 												</div>
 											</div>
 
 											<div class="form-group">
 												<div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-keyboard-o fa-fw"></i> Apellido*</span>
-													<input name="txt_apellido" type="text" class="form-control" id="txt_apellido" value="<?php echo $txt_apellido;?>"/>
+													<input name="txt_apellido" type="text" class="form-control" id="txt_apellido" value="<?php echo $txt_apellido;?>" required/>
 												</div>
 											</div>
 
 											<div class="form-group">
 											   <div class="input-group">
 												   <span class="input-group-addon"><i class="fa fa-id-card fa-fw"></i> DNI*</span>
-												   <input name="txt_dni" type="text" class="form-control" id="txt_dni" value="<?php echo $txt_dni;?>"/>
+												   <input name="txt_dni" type="number" class="form-control" id="txt_dni" value="<?php echo $txt_dni;?>" required/>
 											   </div>
 											</div>
 
-											<div class="form-group" readonly>
+											<div class="form-group" hidden>
 												<div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-calendar-o fa-fw"></i> Fecha nacimiento </span>
 													<div class='input-group date' id='divMiCalendario'>
-														<input name="txt_fecha_nac" type='text' id="txt_fecha_nac" class="form-control" value="" readonly/>
+														<input name="txt_fecha_nac" type='text' id="txt_fecha_nac" class="form-control" value=""  />
 														<span class="input-group-addon"><i class="fa fa-calendar fa-fw"></i></span>
 													</div>
 												</div>
 											</div>
 
-											<div class="form-group">
+											<div class="form-group" hidden>
 												<div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-bug fa-fw"></i> Sexo*</span>
 													<div class="col-xs-15 selectContainer">
-														<select class="form-control" id="select_sexo" name="select_sexo">
+														<select class="form-control" id="select_sexo" name="select_sexo" >
 															<option value = "m" selected="selected"> M </option>
 															<option value = "f"> F </option>
 														</select>
@@ -316,22 +229,22 @@ if($validado == true)
 
 											<div class="form-group">
 											   <div class="input-group">
-													<span class="input-group-addon"><i class="fa fa-map-signs fa-fw"></i> Calle*</span>
-													<input name="txt_calle" type="text" class="form-control" id="txt_calle" value="<?php echo $txt_calle;?>"/>
+													<span class="input-group-addon"><i class="fa fa-map-signs fa-fw"></i> Domicilio*</span>
+													<input name="txt_calle" type="text" class="form-control" id="txt_calle" value="<?php echo $txt_calle;?>" />
 											   </div>
 											</div>
 
 											<div class="form-group">
 											   <div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-hashtag fa-fw"></i> Número*</span>
-													<input name="txt_nro" type="text" class="form-control" id="txt_nro" value="<?php echo $txt_nro;?>"/>
+													<input name="txt_nro" type="number" class="form-control" id="txt_nro" value="<?php echo $txt_nro;?>" />
 												</div>
 											</div>
 
 											<div class="form-group">
 											   <div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-map-o fa-fw"></i> Barrio</span>
-													<input name="txt_barrio" type="text" class="form-control" id="txt_barrio" value="<?php echo $txt_barrio;?>"/>
+													<input name="txt_barrio" type="text" class="form-control" id="txt_barrio" value="<?php echo $txt_barrio;?>" required/>
 											   </div>
 											</div>
 
@@ -349,23 +262,23 @@ if($validado == true)
 											   </div>
 											</div>
 
-											<div class="form-group">
+											<div class="form-group" hidden>
 												 <div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-map-o fa-fw"></i> Codigo postal</span>
 													<input name="txt_cp" type="text" class="form-control" id="txt_cp" value="8400"/>
 												 </div>
 											</div>
 
-											<div class="form-group">
+											<div class="form-group" hidden>
 												 <div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-map-o fa-fw"></i> Pais </span>
-													<input name="txt_pais" type="text" class="form-control" id="txt_pais" value="Argentina"/>
+													<input name="txt_pais" type="text" class="form-control" id="txt_pais" value=""/>
 												 </div>
 											</div>
 
-											<div class="form-group">
+											<div class="form-group" hidden>
 												<div class="input-group">
-													<span class="input-group-addon"><i class="fa fa-bug fa-fw"></i> Estado civil*</span>
+													<span class="input-group-addon"><i class="fa fa-bug fa-fw"></i> Estado civil</span>
 													<div class="col-xs-15 selectContainer">
 														<select class="form-control" id="select_ec" name="select_ec">
 															<option value = "soltero" selected="selected"> Soltero/a </option>
@@ -380,14 +293,14 @@ if($validado == true)
 											<div class="form-group">
 												<div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-phone fa-fw"></i> Teléfono*</span>
-													<input name="txt_telefono" type="text" class="form-control" id="txt_telefono" value="<?php echo $txt_telefono;?>"/>
+													<input name="txt_telefono" type="number" class="form-control" id="txt_telefono" value="<?php echo $txt_telefono;?>" required/>
 												</div>
 											</div>
 
 											<div class="form-group">
 												<div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-at fa-fw"></i> Email</span>
-													<input name="txt_email" type="text" class="form-control" id="txt_email" value="<?php echo $txt_email;?>"/>
+													<input name="txt_email" type="email" class="form-control" id="txt_email" value="<?php echo $txt_email;?>"/>
 												</div>
 											</div>
 										<input name="Submit" type="submit" method="post" class="btn btn-sm btn-primary btn-block" value="GUARDAR" />

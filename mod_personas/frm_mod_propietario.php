@@ -1,12 +1,8 @@
 
 <?php
 //--------------------------------Inicio de sesion------------------------
-include("../lib/sesion.php");
-if ($_SESSION['permiso'] != 'autorizado' ){
-	$mensaje="Usuario sin permisos";
-	$destino="../index.php";
-	header("location:../lib/mensaje.php?mensaje=$mensaje&destino=$destino");
-}
+include("../inc/sesion.php");
+
 //--------------------------------Fin inicio de sesion------------------------
 
 //Parametros - var - librerias
@@ -14,7 +10,7 @@ include("../lib/funciones.php");
 include("../mod_sql/sql.php");
 
 //Inicializo variables
-$cargaInicialForm = 0;
+/*$cargaInicialForm = 0;
 $flagPersistencia = false;
 
 $valNombre = false;
@@ -28,11 +24,11 @@ $valTelefono = false;
 $valTelefonoNum = false;
 $valEmail = false;
 $valPersona = false;
-$errorPersona = false;
+$errorPersona = false;*/
 
 //Capturo variables
-$txt_dni_original = $_POST['txt_dni_original'];
-$nombre = $_POST['txt_nombre_propietario'];
+$id_persona = $_POST['id_persona'];
+/*$nombre = $_POST['txt_nombre_propietario'];
 $apellido = $_POST['txt_apellido'];
 $dni = $_POST['txt_dni_modificado'];
 $telefono = $_POST['txt_telefono'];
@@ -41,19 +37,21 @@ $numero = $_POST['txt_nro'];
 $barrio = $_POST['txt_barrio'];
 $piso = $_POST['txt_piso'];
 $dpto = $_POST['txt_dpto'];
-$email = $_POST['txt_email'];
+$email = $_POST['txt_email'];*/
 
 //Capturo dni encontrado
-$buscar_dni = $_GET['txt_buscar_dni'];
+//$buscar_dni = $_GET['txt_buscar_dni'];
 
-if ($buscar_dni == "") {
+/*if ($buscar_dni == "") {
 	$dni=$buscar_dni= $pDni;
-}
+}*/
 
 //#########################################LLAMO A BUSCAR PROPIETARIO################################
-if (!empty($buscar_dni))
+if (!empty($id_persona))
 {
-	$propietario = sql_buscar_propietario($buscar_dni);
+	echo "ID: ".$id_persona;
+	exit();
+	$propietario = sql_buscar_persona_id($id_persona);
 
 	$numeroRow = mysql_num_rows($propietario); // obtenemos el número de filas
 
@@ -62,9 +60,9 @@ if (!empty($buscar_dni))
 		while ($row=mysql_fetch_array($propietario))
 		{
 			$dni = ($row['documento']);
-			$txt_dni_original = $dni;
-			$nombre = ($row['nombre']);
-			$apellido = ($row['apellido']);
+			//$txt_dni_original = $dni;
+			$nombre = ($row['NOMBRE']);
+			$apellido = ($row['APELLIDO']);
 			$telefono = ($row['telefono']);
 			$calle = ($row['calle']);
 			$numero = ($row['numero']);
@@ -79,7 +77,7 @@ if (!empty($buscar_dni))
 //sql_update_propietario($txt_dni_original,$txt_dni,$txt_nombre_propietario,$txt_apellido,$txt_telefono,$txt_calle,$txt_nro,$txt_barrio);
 //#########################################PERSISTIR DATOS####################################################
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+/*if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 	$buscar_dni = $_POST['txt_dni_modificado'];
 
@@ -103,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	{
 		$valApellido = true;
 
-	}elseif ($dni == "") 
+	}elseif ($dni == "")
 	{
 		$valDocumento = true;
 
@@ -111,14 +109,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	{
 		$valCalle = true;
 
-	}elseif ($numero == "") 
+	}elseif ($numero == "")
 	{
 		$valNumero = true;
 	}elseif (!is_numeric($numero))
 	{
 		$valNumeroNum = true;
 
-	}elseif ($barrio == "") 
+	}elseif ($barrio == "")
 	{
 		$valBarrio = true;
 
@@ -132,7 +130,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	}elseif($email != "" && !filter_var($email, FILTER_VALIDATE_EMAIL))
 	{
 		$valEmail = true;
-		
+
 	}else
 	{
 		$update = sql_update_propietario($txt_dni_original,$dni,$nombre,$apellido,$telefono,$calle,$numero,$barrio,$piso,$dpto,$email);
@@ -147,7 +145,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	}
 
 }
-
+*/
 ?>
 
 <!DOCTYPE html">
@@ -313,7 +311,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 						$valPersona = false;
 					}
 				?>
-			
+
 					<div class="row">
 						<div class="col-md-4 col-md-offset-4">
 							<div class="panel panel-default">
@@ -391,8 +389,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 													<input name="txt_email" type="text" class="form-control" id="txt_email" value="<?php echo $email;?>"/>
 												</div>
 											</div>
-											
-											<input name="Submit" type="submit" method="post" class="btn btn-sm btn-primary btn-block btn-danger" value="GUARDAR CAMBIOS" />	
+
+											<input name="Submit" type="submit" method="post" class="btn btn-sm btn-primary btn-block btn-danger" value="GUARDAR CAMBIOS" />
 									</form>
 								</div>
 							</div>

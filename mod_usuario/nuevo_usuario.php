@@ -1,6 +1,6 @@
 <?php
 //--------------------------------Inicio de sesion------------------------
-include("../lib/sesion.php");
+include("../inc/sesion.php");
 if ($_SESSION['permiso'] != 'autorizado' ){
 	$mensaje="Usuario sin permisos";
 	$destino="index.php";
@@ -14,7 +14,7 @@ $link = conectarse_mysql_veterinaria();
 $sql = "SELECT * FROM roles";
 $stmt = mysql_query($sql,$link);
 
-echo $_SESSION['rol'];
+//echo $_SESSION['rol'];
 ?>
 <!DOCTYPE html>
 <html lang="en">

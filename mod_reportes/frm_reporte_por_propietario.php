@@ -1,6 +1,6 @@
 <?php
 //--------------------------------Inicio de sesion------------------------
-include("../lib/sesion.php");
+include("../inc/sesion.php");
 include("../mod_sql/sql.php");
 include("../lib/funciones.php");
 
@@ -107,7 +107,7 @@ while($fila = mysql_fetch_assoc($stmtP)){
 							<div class="form-group">
 								<div class="input-group">
 									<span class="input-group-addon">
-											<input name="buscar_propietario" type="text" id="buscar_propietario" class="form-control" placeholder="Ingrese DNI a buscar..."/>
+											<input name="buscar_propietario" type="text" id="buscar_propietario" class="form-control" placeholder="Ingrese Documento a buscar..."/>
 										</span>
 								</div>
 							</div>
@@ -165,7 +165,7 @@ while($fila = mysql_fetch_assoc($stmtP)){
 							<div class="panel-body">
 								<form class="form form-signup" role="form">
 
-								<h4 class="text-center"><img src="../images/icons/veterinario.png" alt="Municipalidad Bariloche" align="center" style="margin:0px 0px 0px 0px" height="64" width="64"></h4>
+								<h4 class="text-center"><img src="../images/icons/propietario.png" alt="Municipalidad Bariloche" align="center" style="margin:0px 0px 0px 0px" height="64" width="64"></h4>
 
 								<div class="form-group">
 									<div class="input-group">

@@ -2,29 +2,28 @@
 <?php
 //--------------------------------Inicio de sesion------------------------
 
-include("../lib/sesion.php");
-if ($_SESSION['permiso'] != 'autorizado' ){
-	$mensaje="Usuario sin permisos";
-	$destino="../index.php";
-	header("location:../lib/mensaje.php?mensaje=$mensaje&destino=$destino");
-}
-//--------------------------------Fin inicio de sesion------------------------
-
-//Parametros - var - librerias
+include("../inc/sesion.php");
 include("../lib/funciones.php");
 include("../mod_sql/sql.php");
 
-
 //Inicializo variables
-$cargaInicialForm = 0;
-$flagPersistencia = false;
+/*cargaInicialForm = 0;
+$flagPersistencia = false;*/
 
 //Capturo dni encontrado
-$buscar_dni = $_POST['txt_buscar_dni'];
+if(isset($_POST['txt_buscar_dni'])){
+		$buscar_dni = $_POST['txt_buscar_dni'];
+}else{
+	$buscar_dni = $_POST['txt_documento'];
+}
+
 
 if ($buscar_dni == "") {
 	$dni=$buscar_dni= $pDni;
 }
+
+//Cargo barrios
+$barrios = sql_buscar_barrios();
 
 //#########################################LLAMO A BUSCAR PROPIETARIO################################
 if (!empty($buscar_dni)){
@@ -35,6 +34,7 @@ if (!empty($buscar_dni)){
 	if ($propietario && $numeroRow > 0)
 	{
 		while ($row=mysql_fetch_array($propietario)){
+			$id_persona = ($row['id_persona']);
 			$dni = ($row['DOCUMENTO']);
 			$nombre = ($row['NOMBRE']);
 			$apellido = ($row['APELLIDO']);
@@ -52,6 +52,32 @@ if (!empty($buscar_dni)){
 	}
 }
 
+if(isset($_POST['guardar']))
+{
+	$id_persona = $_POST['txt_id'];
+	$dni = $_POST['txt_dni_modificado'];
+	$nombre = $_POST['txt_nombre_propietario'];
+	$apellido = $_POST['txt_apellido'];
+	$telefono = $_POST['txt_telefono'];
+	$calle = $_POST['txt_calle'];
+	$numero = $_POST['txt_nro'];
+	$barrio = $_POST['select_barrio'];
+	$piso = $_POST['txt_piso'];
+	$dpto = $_POST['txt_dpto'];
+	$email = $_POST['txt_email'];
+
+	$persona = sql_update_propietario($id_persona, $dni, $nombre, $apellido, $telefono, $calle, $numero, $barrio, $piso, $dpto, $email);
+
+	if (!$persona)
+	{
+		$errorPersona = true;
+	}
+	else{
+
+		$successPersona = true;
+	}
+}
+
 ?>
 
 <!DOCTYPE html">
@@ -61,7 +87,7 @@ if (!empty($buscar_dni)){
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="icon" type="image/png" href="../images/icons/logo_vet.png" sizes="16x16">
-    <title>Sistema VyZ MSCB-Detalle Persona</title>
+    <title>Sistema VyZ MSCB - Modificar Persona</title>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script language='javascript' src="../js/jquery-1.12.3.js"></script>
@@ -84,7 +110,7 @@ if (!empty($buscar_dni)){
 
 	function set_focus()
 	{
-		document.getElementById("txt_nombre_animal").focus();
+		document.getElementById("txt_nombre_propietario").focus();
 		alert("focus animal nombre");
 		return (false);
 	}
@@ -117,85 +143,126 @@ if (!empty($buscar_dni)){
 		<div class="jumbotron">
 			<h4 class="text-center bg-info">Detalle Persona</h4>
 			<div class="container">
-				<form id="form_detalle_propietario" name="form_detalle_propietario" method="post" onsubmit="" action="frm_buscar_propietario.php" >
+				<form id="form_detalle_propietario" name="form_detalle_propietario" method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" >
+
+					<?php
+					if($successPersona == true){
+						echo "
+							<div class='alert alert-success-alt alert-dismissable'>
+							<span class='glyphicon glyphicon-ok'></span>
+							<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
+							×</button>La Persona se modificó correctamente.</div>
+						";
+						$successPersona = false;
+					}elseif($errorPersona == true){
+						echo "
+							<div class='alert alert-danger-alt alert-dismissable'>
+							<span class='glyphicon glyphicon-exclamation-sign'></span>
+							<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>
+							×</button>Error al modificar la Persona.</div>
+						";
+						$errorPersona = false;
+					}
+						?>
+
 					<div class="row">
 						<div class="col-md-4 col-md-offset-4">
 							<div class="panel panel-default">
 								<div class="panel-body">
 									<form class="form form-signup" role="form">
-										<h4 class="text-center"><img src="../images/icons/propietario.png" alt="Municipalidad Bariloche" align="center" style="margin:0px 0px 0px 0px" height="64" width="64"></h4>
+										<h4 class="text-center"><img src="../images/icons/family.png" alt="Municipalidad Bariloche" align="center" style="margin:0px 0px 0px 0px" height="64" width="64"></h4>
 											<div class="form-group">
 												<div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-keyboard-o fa-fw"></i> Nombre</span>
-													<input name="txt_nombre_propietario" type="text" class="form-control" id="txt_nombre_propietario" value="<?php echo $nombre;?>" disabled="disabled"/>
+													<input name="txt_nombre_propietario" type="text" class="form-control" id="txt_nombre_propietario" value="<?php echo $nombre;?>" required/>
+													<input name="txt_id" type="hidden" class="form-control" id="txt_id" value="<?php echo $id_persona;?>"/>
 												</div>
 											</div>
 
 											<div class="form-group">
 												<div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-keyboard-o fa-fw"></i> Apellido</span>
-													<input name="txt_apellido" type="text" class="form-control" id="txt_apellido" value="<?php echo $apellido;?>" disabled="disabled"/>
+													<input name="txt_apellido" type="text" class="form-control" id="txt_apellido" value="<?php echo $apellido;?>" required/>
 												</div>
 											</div>
 
 											<div class="form-group">
 											   <div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-id-card fa-fw"></i> DNI</span>
-													<input name="txt_dni_modificado" type="text" class="form-control" id="txt_dni_modificado" value="<?php echo $dni;?>" disabled="disabled"/>
+													<input name="txt_dni_modificado" type="text" class="form-control" id="txt_dni_modificado" value="<?php echo $dni;?>" required/>
 											   </div>
 											</div>
 
 											<div class="form-group">
 											   <div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-map-signs fa-fw"></i> Domicilio</span>
-													<input name="txt_calle" type="text" class="form-control" id="txt_domicilio" value="<?php echo $calle;?>" disabled="disabled"/>
+													<input name="txt_calle" type="text" class="form-control" id="txt_domicilio" value="<?php echo $calle;?>"/>
 											   </div>
 											</div>
 
 											<div class="form-group">
 											   <div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-hashtag fa-fw"></i> Número*</span>
-													<input name="txt_nro" type="text" class="form-control" id="txt_domicilio" value="<?php echo $numero;?>" disabled="disabled"/>
+													<input name="txt_nro" type="text" class="form-control" id="txt_domicilio" value="<?php echo $numero;?>" />
+												</div>
+											</div>
+											
+											<div class="form-group">
+												<div class="input-group">
+													<span class="input-group-addon"><i class="fa fa-map-marker fa-fw"></i> Barrio*</span>
+													<div class="col-xs-15 selectContainer">
+														
+														<select class="form-control" id="select_barrio" name="select_barrio"  required>
+															<option  selected="selected"> <?php echo $barrio;?> </option>
+															<?php
+																while ($row=mysql_fetch_array($barrios))
+																{
+																	$id_barrio = ($row['codigo']);
+
+																	$barrio = ($row['concepto']);
+
+																	?>
+																<option value = "<?php echo $barrio; ?>" ><?php echo $barrio;?> </option>
+															<?php
+															}
+															?>
+
+														</select>
+
+													</div>
 												</div>
 											</div>
 
 											<div class="form-group">
 											   <div class="input-group">
-													<span class="input-group-addon"><i class="fa fa-map-o fa-fw"></i> Barrio</span>
-													<input name="txt_barrio" type="text" class="form-control" id="txt_domicilio" value="<?php echo $barrio;?>" disabled="disabled"/>
-											   </div>
-											</div>
-
-											<div class="form-group">
-											   <div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-building-o fa-fw"></i> Piso</span>
-													<input name="txt_piso" type="text" class="form-control" id="txt_piso" value="<?php echo $piso;?>" disabled="disabled"/>
+													<input name="txt_piso" type="text" class="form-control" id="txt_piso" value="<?php echo $piso;?>" />
 											   </div>
 											</div>
 
 											<div class="form-group">
 											   <div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-building-o fa-fw"></i> Dpto.</span>
-													<input name="txt_dpto" type="text" class="form-control" id="txt_dpto" value="<?php echo $dpto;?>" disabled="disabled"/>
+													<input name="txt_dpto" type="text" class="form-control" id="txt_dpto" value="<?php echo $dpto;?>"/>
 											   </div>
 											</div>
 
 											<div class="form-group">
 												<div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-phone fa-fw"></i> Teléfono*</span>
-													<input name="txt_telefono" type="text" class="form-control" id="txt_telefono" value="<?php echo $telefono;?>" disabled="disabled"/>
+													<input name="txt_telefono" type="text" class="form-control" id="txt_telefono" value="<?php echo $telefono;?>" required/>
 												</div>
 											</div>
 
 											<div class="form-group">
 												<div class="input-group">
 													<span class="input-group-addon"><i class="fa fa-at fa-fw"></i> Email</span>
-													<input name="txt_email" type="text" class="form-control" id="txt_email" value="<?php echo $email;?>" disabled="disabled"/>
+													<input name="txt_email" type="email" class="form-control" id="txt_email" value="<?php echo $email;?>" />
 												</div>
 											</div>
 									</form>
 
-									<input id="txt_cerrar" name="txt_cerrar" type="submit"  class="btn btn-sm btn-primary btn-block" value="CERRAR" />
+									<input id="guardar" name="guardar" type="submit"  class="btn btn-sm btn-primary btn-block" value="GUARDAR CAMBIOS" onclick="return confirm('¿Desea MODIFICAR la persona?');"/>
 
 								</div>
 							</div>

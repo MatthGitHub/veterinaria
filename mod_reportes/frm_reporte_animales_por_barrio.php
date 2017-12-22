@@ -11,6 +11,9 @@ if ($_SESSION['permiso'] != 'autorizado' ){
 }
 //--------------------------------Fin inicio de sesion------------------------
 
+//Cargo barrios
+$barrios = sql_buscar_barrios();
+
 ?>
 
 <!DOCTYPE html>
@@ -54,13 +57,34 @@ if ($_SESSION['permiso'] != 'autorizado' ){
 					  <div class="panel panel-default">
 						<div class="panel-body"
 						  <form class="form form-signup" role="form">
-							<div class="form-group">
+							
+						  	<div class="form-group">
 								<div class="input-group">
-									<span class="input-group-addon">
-											<input name="barrio" type="text" id="barrio" class="form-control" placeholder="Escribir aquí barrio"/>
-										</span>
+									<span class="input-group-addon"><i class="fa fa-map-marker fa-fw"></i> Barrio*</span>
+									<div class="col-xs-15 selectContainer">
+										
+										<select class="form-control" id="select_barrio" name="select_barrio"  required>
+											<option  selected="selected"> <?php echo $barrio;?> </option>
+											<?php
+												while ($row=mysql_fetch_array($barrios))
+												{
+													$id_barrio = ($row['codigo']);
+
+													$barrio = ($row['concepto']);
+
+													?>
+												<option value = "<?php echo $barrio; ?>" ><?php echo $barrio;?> </option>
+											<?php
+											}
+											?>
+
+										</select>
+
+									</div>
 								</div>
 							</div>
+
+							
 							<input type="submit" name="Buscar_usuario" value="Buscar" method="post" onclick="submit()" class="btn btn-sm btn-primary btn-block">
 
 					</form>

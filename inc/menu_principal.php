@@ -1,7 +1,7 @@
 <?php
 error_reporting(0);
 //--------------------------------Inicio de sesion------------------------
-include("../lib/sesion.php");
+include("../inc/sesion.php");
 if ($_SESSION['permiso'] != 'autorizado' ){
 	$mensaje=" Usuario sin permisos";
 	$destino="../index.php";
@@ -45,7 +45,7 @@ if ($_SESSION['permiso'] != 'autorizado' ){
 				<div class="col-lg-5">
 					<p>
 					   <a class="btn btn-lg btn-direct" href="../mod_animales/frm_buscar_ejemplar.php" role="button">Buscar Animal</a>
-					   <a class="btn btn-lg btn-direct" href="../mod_personas/frm_buscar_propietario.php" role="button">Buscar Persona</a>
+					   <a class="btn btn-lg btn-direct" href="../mod_personas/personas_grilla.php" role="button">Buscar Persona</a>
 					</p>
 				</div>
 				<div class="col-lg-5">

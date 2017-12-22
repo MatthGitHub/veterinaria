@@ -1,6 +1,6 @@
-<?php 
+<?php
 //--------------------------------Inicio de sesion------------------------
-include("../lib/sesion.php"); 
+include("../inc/sesion.php"); 
 if ($_SESSION['permiso'] != 'autorizado' ){
 	$mensaje="Usuario sin permisos";
 	$destino="index.php";
@@ -13,7 +13,7 @@ if ($_SESSION['permiso'] != 'autorizado' ){
 
 <!DOCTYPE html>
 <html lang="en">
-  
+
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -31,41 +31,41 @@ if ($_SESSION['permiso'] != 'autorizado' ){
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-	
+
 	<script language='javascript' src="../jscripts/funciones.js"></script>
 	<script type="text/JavaScript">
 
-		/*function vacio(q) {  
-				for ( i = 0; i < q.length; i++ ) {  
-						if ( q.charAt(i) != " " ) {  
-								return true  
-						}  
-				}  
-				return false  
+		/*function vacio(q) {
+				for ( i = 0; i < q.length; i++ ) {
+						if ( q.charAt(i) != " " ) {
+								return true
+						}
+				}
+				return false
 		}
 		//-------------Validaciones del formulario---------------------------//
 		function validar(frm) {
 
 		   if ( document.form1.txt_clave.value != document.form1.txt_clave2.value ){
-				alert("La clave ingresada y su repetición no coinciden"); 
+				alert("La clave ingresada y su repetición no coinciden");
 				document.form1.txt_clave.focus();
-				return (false); 
+				return (false);
 			}
-			
+
 			if (vacio(document.form1.txt_clave.value)== false | document.form1.txt_clave.value.length<=3 ){
-				alert("Debe ingresar la nueva clave"); 
+				alert("Debe ingresar la nueva clave");
 				document.form1.txt_clave.focus();
-				return (false); 
+				return (false);
 			}
-			
+
 			if (vacio(document.form1.txt_clave2.value)== false | document.form1.txt_clave2.value.length<=3 ){
-				alert("Debe repetir la clave"); 
+				alert("Debe repetir la clave");
 				document.form1.txt_clave2.focus();
-				return (false); 
+				return (false);
 			}
-			
-				  if (!confirm('¿Confirma el cambio de clave?')){   
-			   return (false); 
+
+				  if (!confirm('¿Confirma el cambio de clave?')){
+			   return (false);
 		   }
 		}*/
 	</script>
@@ -77,7 +77,7 @@ if ($_SESSION['permiso'] != 'autorizado' ){
 	<div class="container">
 		<!-- Static navbar -->
 		<?php include "../inc/menu.php"; ?>
-     
+
 		 <!-- Main component for a primary marketing message or call to action -->
 	    <div class="jumbotron">
 		  <h4 class="text-center bg-info">Cambiar clave</h4>
@@ -161,4 +161,3 @@ if ($_SESSION['permiso'] != 'autorizado' ){
 
   </body>
 </html>
-

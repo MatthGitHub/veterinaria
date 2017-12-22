@@ -1,6 +1,6 @@
 <?php
 //--------------------------------Inicio de sesion------------------------
-include("../lib/sesion.php");
+include("../inc/sesion.php");
 include("../lib/funciones.php");
 if ($_SESSION['permiso'] != 'autorizado' ){
 	$mensaje="Usuario sin permisos";
@@ -24,10 +24,28 @@ $stmt = mysql_query($sql,$link);
 	<link rel="icon" type="../image/png" href="../images/icons/logo_vet.png" sizes="16x16">
     <title>Usuarios</title>
 
+   <!-- Bootstrap Core CSS -->
+    <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="../vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link href="../vendor/datatables-plugins/dataTables.bootstrap.css" rel="stylesheet">
+
+    <!-- DataTables Responsive CSS -->
+    <link href="../vendor/datatables-responsive/dataTables.responsive.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../dist/css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <!-- Bootstrap -->
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/bootstrap.css" rel="stylesheet">
-		<link href="../css/jquery.dataTables.min.css" rel="stylesheet">
+  <link href="../css/jquery.dataTables.min.css" rel="stylesheet">
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script language='javascript' src="../js/jquery-1.12.3.js"></script>
@@ -108,26 +126,35 @@ $stmt = mysql_query($sql,$link);
       <?php include('../inc/menu.php'); ?>
       <!-- Main component for a primary marketing message or call to action -->
       <div class="jumbotron">
-	  <h4 class="text-center bg-info">Listado de Usuarios</h4>
+        <h4 class="text-center"><img src="../images/icons/usuarios.png" alt="Municipalidad Bariloche" align="center" style="margin:0px 0px 0px 0px" height="64" width="64"></h4>
+	     <h4 class="text-center bg-info">Listado de Usuarios</h4>
         <div class="row">
-              <table id="example" class="display" cellspacing="0" width="100%">
-                	<thead>
-										<th> Usuario </th>
-										<th> Nombre </th>
-										<th> Area </th>
-										<th> SubArea </th>
-                  </thead>
-                    <tbody>
-                    	<?php while($usuarios = mysql_fetch_array($stmt)){ ?>
-                        <tr class="success">
-                            <td> <?php echo $usuarios['usuario']; ?> </td>
-                            <td> <?php echo $usuarios['nombre']; ?> </td>
-                            <td> <?php echo $usuarios['area']; ?> </td>
-                            <td> <?php echo $usuarios['subarea']; ?> </td>
+          <div class="col-lg-12">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                    Personas
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                  <table id="example" width="100%" class="table table-striped table-bordered table-hover">
+                    	<thead>
+                        <tr>
+      										<th> Usuario </th>
+      										<th> Nombre </th>
                         </tr>
-                        <?php } ?>
-                    </tbody>
-              </table>
+                      </thead>
+                        <tbody>
+                        	<?php while($usuarios = mysql_fetch_array($stmt)){ ?>
+                            <tr class="odd gradeX">
+                                <td> <?php echo $usuarios['usuario']; ?> </td>
+                                <td> <?php echo $usuarios['nombre']; ?> </td>
+                            </tr>
+                            <?php } ?>
+                        </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
 
 				</div>
       </div>

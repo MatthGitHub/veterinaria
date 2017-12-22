@@ -40,7 +40,7 @@ if (!empty($_POST['txt_buscar'])) {
 	<meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="icon" type="image/png" href="../images/logo.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="../images/icons/logo_vet.png" sizes="16x16">
     <title>Sistema Veterinaria y Zoonosis MSCB</title>
 
     <!-- Bootstrap Core CSS -->
@@ -101,7 +101,7 @@ function validar(){
             <div class="row">
                 <div class="col-lg-3">
                 <br>
-                <h4 class="text-center"><img src="../images/nueva_profesion.png" alt="Municipalidad Bariloche" align="center" style="margin:0px 0px 0px 0px" height="64" width="64"></h4>
+                <h4 class="text-center"><img src="../images/icons/chipeadores.png" alt="Municipalidad Bariloche" align="center" style="margin:0px 0px 0px 0px" height="64" width="64"></h4>
 
                 <h4 class="text-center bg-info">Chipeadores</h4>
                 </div>

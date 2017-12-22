@@ -21,7 +21,8 @@
 				  <li class="dropdown">
 					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-id-badge fa-fw"></i> Personas<span class="caret"></span></a>
 					  <ul class="dropdown-menu">
-						<li><a href="../mod_personas/frm_buscar_propietario.php">Buscar Persona</a></li>
+						<li><a href="../mod_personas/frm_buscar_propietario.php">Alta Persona</a></li>
+						<li><a href="../mod_personas/personas_grilla.php">Buscar Persona</a></li>
 						<li><a href="../mod_chipeadores/chipeadores.php">Chipeadores</a></li>
 					  </ul>
 				  </li>

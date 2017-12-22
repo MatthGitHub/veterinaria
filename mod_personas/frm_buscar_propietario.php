@@ -2,7 +2,7 @@
 <?php
 //--------------------------------Inicio de sesion------------------------
 
-include("../lib/sesion.php");
+include("../inc/sesion.php");
 if ($_SESSION['permiso'] != 'autorizado' ){
 	$mensaje="Usuario sin permisos";
 	$destino="../index.php";
@@ -47,7 +47,6 @@ include("../mod_sql/sql.php");
 
       <!-- Main component for a primary marketing message or call to action -->
 		<div class="jumbotron">
-			<h4 class="text-center"><img src="../images/icons/propietario_blanco.png" alt="Municipalidad Bariloche" align="center" style="margin:0px 0px 0px 0px" height="64" width="64"></h4>
 			<h4 class="text-center bg-info">Buscar personas</h4>
 			<div class="container">
 				<form id="formBuscar" name="formBuscar" method="post" value= "buscar_propietario" action="frm_detalle_propietario.php">
@@ -56,6 +55,7 @@ include("../mod_sql/sql.php");
 					  <div class="panel panel-default">
 						<div class="panel-body"
 						  <form class="form form-signup" role="form">
+						  	<h4 class="text-center"><img src="../images/icons/family.png" alt="Municipalidad Bariloche" align="center" style="margin:0px 0px 0px 0px" height="64" width="64"></h4>
 							<div class="form-group">
 							  <div class="input-group">
 								<span class="input-group-addon"><i class="fa fa-search fa-fw"></i></span>

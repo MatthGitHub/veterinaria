@@ -1,6 +1,7 @@
 <?php
-include("../lib/sesion.php");
+include("../inc/sesion.php");
 include("../lib/funciones.php");
+include("../mod_sql/sql.php");
 
 // Primero comprobamos que ning�n campo est� vac�o y que todos los campos existan.
     if(isset($_POST['claveA']) && !empty($_POST['claveA']) &&
